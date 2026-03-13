@@ -1,37 +1,51 @@
 import { EditorView } from '@codemirror/view';
 
+// Official Harper lint kind color map — matches packages/lint-framework/src/lint/lintKindColor.ts
+const LINT_KIND_COLORS: Record<string, string> = {
+  Agreement: '#228B22',
+  BoundaryError: '#8B4513',
+  Capitalization: '#540D6E',
+  Eggcorn: '#FF8C00',
+  Enhancement: '#0EAD69',
+  Formatting: '#7D3C98',
+  Grammar: '#9B59B6',
+  Malapropism: '#C71585',
+  Miscellaneous: '#3BCEAC',
+  Nonstandard: '#008B8B',
+  Punctuation: '#D4850F',
+  Readability: '#2E8B57',
+  Redundancy: '#4682B4',
+  Regionalism: '#C061CB',
+  Repetition: '#00A67C',
+  Spelling: '#EE4266',
+  Style: '#FFD23F',
+  Typo: '#FF6B35',
+  Usage: '#1E90FF',
+  WordChoice: '#228B22',
+};
+
+const FALLBACK_COLOR = '#6c757d';
+
+export function lintKindColor(kind: string): string {
+  return LINT_KIND_COLORS[kind] ?? FALLBACK_COLOR;
+}
+
+/** Returns 'black' or 'white' depending on which contrasts better with the given hex color. */
+export function lintKindTextColor(kind: string): 'black' | 'white' {
+  const hex = lintKindColor(kind).replace('#', '');
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  // Relative luminance formula
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? 'black' : 'white';
+}
+
 export const baseTheme = EditorView.baseTheme({
   // Base lint decoration
   '.cm-harper-lint': {
     cursor: 'default',
     borderRadius: '2px',
-  },
-  // Spelling errors
-  '.cm-harper-spelling': {
-    textDecorationLine: 'underline',
-    textDecorationStyle: 'solid',
-    textDecorationColor: '#e03e3e',
-    textDecorationThickness: '2px',
-    textUnderlineOffset: '3px',
-    backgroundColor: 'rgba(224, 62, 62, 0.07)',
-  },
-  // Suggestions
-  '.cm-harper-suggestion': {
-    textDecorationLine: 'underline',
-    textDecorationStyle: 'solid',
-    textDecorationColor: '#0969da',
-    textDecorationThickness: '2px',
-    textUnderlineOffset: '3px',
-    backgroundColor: 'rgba(9, 105, 218, 0.07)',
-  },
-  // Dark mode decorations
-  '&dark .cm-harper-spelling': {
-    textDecorationColor: '#f47067',
-    backgroundColor: 'rgba(244, 112, 103, 0.12)',
-  },
-  '&dark .cm-harper-suggestion': {
-    textDecorationColor: '#58a6ff',
-    backgroundColor: 'rgba(88, 166, 255, 0.12)',
   },
   // Tooltip card container (class added via mount callback)
   '.cm-harper-card.cm-tooltip': {
@@ -64,22 +78,6 @@ export const baseTheme = EditorView.baseTheme({
     fontSize: '11px',
     fontWeight: '600',
     letterSpacing: '0.2px',
-  },
-  '.cm-harper-badge-spelling': {
-    backgroundColor: 'rgba(224, 62, 62, 0.1)',
-    color: '#c53030',
-  },
-  '.cm-harper-badge-suggestion': {
-    backgroundColor: 'rgba(9, 105, 218, 0.1)',
-    color: '#0550ae',
-  },
-  '&dark .cm-harper-badge-spelling': {
-    backgroundColor: 'rgba(244, 112, 103, 0.15)',
-    color: '#f47067',
-  },
-  '&dark .cm-harper-badge-suggestion': {
-    backgroundColor: 'rgba(88, 166, 255, 0.15)',
-    color: '#58a6ff',
   },
   '.cm-harper-message': {
     fontSize: '13px',

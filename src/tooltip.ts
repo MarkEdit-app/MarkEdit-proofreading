@@ -3,6 +3,7 @@ import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
+import { lintKindColor } from './styling';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
@@ -74,7 +75,10 @@ function createTooltipDOM(view: EditorView, diagnostic: Diagnostic) {
   header.className = 'cm-harper-header';
 
   const badge = document.createElement('span');
-  badge.className = `cm-harper-badge cm-harper-badge-${diagnostic.category}`;
+  badge.className = 'cm-harper-badge';
+  const color = lintKindColor(diagnostic.lintKind);
+  badge.style.backgroundColor = `${color}22`;
+  badge.style.color = color;
   badge.textContent = diagnostic.title;
   header.appendChild(badge);
   dom.appendChild(header);

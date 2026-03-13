@@ -3,13 +3,12 @@ import type { DecorationSet } from '@codemirror/view';
 import { StateField, StateEffect } from '@codemirror/state';
 import { SuggestionKind } from 'harper.js';
 import type { Lint, Suggestion } from 'harper.js';
-
-export type DiagnosticCategory = 'spelling' | 'suggestion';
+import { lintKindColor } from './styling';
 
 export interface Diagnostic {
   from: number;
   to: number;
-  category: DiagnosticCategory;
+  lintKind: string;
   title: string;
   message: string;
   actions: DiagnosticAction[];
@@ -37,10 +36,17 @@ export const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; d
         const ranges = diagnostics
           .filter(d => d.from < d.to)
           .map(d => {
-            const cls = d.category === 'spelling'
-              ? 'cm-harper-lint cm-harper-spelling'
-              : 'cm-harper-lint cm-harper-suggestion';
-            return Decoration.mark({ class: cls }).range(d.from, d.to);
+            const color = lintKindColor(d.lintKind);
+            return Decoration.mark({
+              class: 'cm-harper-lint',
+              attributes: {
+                style: [
+                  `text-decoration: underline solid ${color} 2px`,
+                  'text-underline-offset: 3px',
+                  `background-color: ${color}22`,
+                ].join('; '),
+              },
+            }).range(d.from, d.to);
           });
 
         value = { diagnostics, decorations: Decoration.set(ranges, true) };
@@ -52,19 +58,13 @@ export const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; d
   provide: f => EditorView.decorations.from(f, val => val.decorations),
 });
 
-function lintCategory(kind: string): DiagnosticCategory {
-  const lower = kind.toLowerCase();
-  if (lower === 'spelling' || lower.includes('spell')) return 'spelling';
-  return 'suggestion';
-}
-
 export function lintToDiagnostic(l: Lint): Diagnostic {
   const span = l.span();
 
   return {
     from: span.start,
     to: span.end,
-    category: lintCategory(l.lint_kind()),
+    lintKind: l.lint_kind(),
     title: l.lint_kind_pretty(),
     message: l.message(),
     actions: l.suggestions().map(suggestionToAction),
