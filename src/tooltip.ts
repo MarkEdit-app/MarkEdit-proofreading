@@ -253,7 +253,9 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   ignore.onmousedown = (e) => e.preventDefault();
   ignore.onclick = () => {
     const { diagnostics } = view.state.field(diagnosticsField);
-    const filtered = diagnostics.filter(d => !(d.from === diagnostic.from && d.to === diagnostic.to));
+    const filtered = diagnostics.filter(d =>
+      !(d.from === diagnostic.from && d.to === diagnostic.to && d.lintKind === diagnostic.lintKind),
+    );
     view.dispatch({
       effects: [
         setClickTooltip.of(null),
