@@ -144,7 +144,7 @@ const cardCSS = `
     border: 1px solid #c0c0c0;
     border-radius: 6px;
     background: transparent;
-    color: #888;
+    color: #555;
     cursor: pointer;
     font-size: 12px;
     font-weight: 400;
@@ -152,7 +152,7 @@ const cardCSS = `
     line-height: 1.4;
     margin-left: auto;
   }
-  .harper-card .harper-ignore:hover { background: rgba(0, 0, 0, 0.05); border-color: #999; color: #555; }
+  .harper-card .harper-ignore:hover { background: rgba(0, 0, 0, 0.05); border-color: #999; }
   @media (prefers-color-scheme: dark) {
     .harper-card {
       background: rgba(40, 40, 40, 0.4);
@@ -178,9 +178,9 @@ const cardCSS = `
     .harper-card .harper-ignore {
       border-color: #555;
       background: transparent;
-      color: #888;
+      color: #bbb;
     }
-    .harper-card .harper-ignore:hover { background: rgba(255, 255, 255, 0.08); border-color: #666; color: #bbb; }
+    .harper-card .harper-ignore:hover { background: rgba(255, 255, 255, 0.08); border-color: #666; }
   }
 `;
 
@@ -235,7 +235,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   msg.style.cssText = `
     font-size: 13px;
     line-height: 1.5;
-    margin: 8px 0 20px;
+    margin: 8px 0 25px;
   `;
   msg.innerHTML = diagnostic.messageHtml;
   content.appendChild(msg);
