@@ -79,7 +79,7 @@ const cardCSS = `
     border-radius: 10px;
     overflow: hidden;
     max-width: 320px;
-    min-width: 180px;
+    min-width: 220px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
     user-select: none;
     -webkit-user-select: none;
