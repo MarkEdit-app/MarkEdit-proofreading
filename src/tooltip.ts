@@ -77,28 +77,27 @@ const cardCSS = `
   .harper-card {
     border-radius: 10px;
     overflow: hidden;
-    max-width: 360px;
+    max-width: 320px;
     min-width: 180px;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.9);
-    border: 0.5px solid rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   }
   .harper-card .harper-close {
     position: absolute;
-    top: 6px;
-    right: 8px;
+    top: 5px;
+    right: 5px;
     background: none;
     border: none;
     cursor: pointer;
     color: #888;
     padding: 4px;
-    line-height: 0;
     z-index: 1;
     display: flex;
     align-items: center;
@@ -117,7 +116,7 @@ const cardCSS = `
     background: rgba(0, 0, 0, 0.06);
   }
   .harper-card .harper-btn {
-    padding: 2px 8px;
+    padding: 2px 6px;
     border: 1px solid #d0d7de;
     border-radius: 6px;
     background: #f6f8fa;
@@ -133,8 +132,8 @@ const cardCSS = `
     border-color: #afb8c1;
   }
   .harper-card .harper-ignore {
-    padding: 2px 8px;
-    border: 0.5px solid #d0d7de;
+    padding: 2px 6px;
+    border: 1px solid #d0d7de;
     border-radius: 6px;
     background: #f6f8fa;
     color: #656d76;
