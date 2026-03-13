@@ -167,20 +167,20 @@ const cardCSS = `
     .harper-card .harper-msg { color: #aaaaaa; }
     .harper-card .harper-msg code { background: rgba(255, 255, 255, 0.08); }
     .harper-card .harper-btn {
-      border-color: #505860;
-      background: #343a44;
-      color: #c9d1d9;
+      border-color: #555;
+      background: #3d3d3d;
+      color: #e0e0e0;
     }
     .harper-card .harper-btn:hover {
-      background: #404850;
-      border-color: #5a6570;
+      background: #4a4a4a;
+      border-color: #666;
     }
     .harper-card .harper-ignore {
-      border-color: #505860;
-      background: #343a44;
-      color: #8b949e;
+      border-color: #555;
+      background: #3d3d3d;
+      color: #999;
     }
-    .harper-card .harper-ignore:hover { background: #404850; border-color: #5a6570; color: #c9d1d9; }
+    .harper-card .harper-ignore:hover { background: #4a4a4a; border-color: #666; color: #e0e0e0; }
   }
 `;
 
