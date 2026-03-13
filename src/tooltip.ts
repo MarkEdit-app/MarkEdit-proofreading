@@ -85,12 +85,8 @@ export const tooltipHandlers = EditorView.domEventHandlers({
   },
 });
 
-function createTooltip(view: EditorView, diagnostic: Diagnostic) {
-  const isDark = view.state.facet(EditorView.darkTheme);
-  const color = colorForKind(diagnostic.lintKind);
-
-  const dom = document.createElement('div');
-  dom.style.cssText = `
+const cardCSS = `
+  .harper-card {
     border-radius: 10px;
     overflow: hidden;
     max-width: 360px;
@@ -100,17 +96,63 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
-    background: ${isDark ? 'rgba(40, 40, 40, 0.82)' : 'rgba(255, 255, 255, 0.85)'};
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    border: 0.5px solid ${isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.15)'};
-    box-shadow: ${isDark
-      ? '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)'
-      : '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)'};
-  `;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+  .harper-card .harper-msg { color: #444444; }
+  .harper-card .harper-btn {
+    padding: 4px 12px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    background: #f6f8fa;
+    color: #24292f;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 1.4;
+  }
+  .harper-card .harper-btn:hover {
+    background: #eaeef2;
+    border-color: #afb8c1;
+  }
+  @media (prefers-color-scheme: dark) {
+    .harper-card {
+      background: rgba(40, 40, 40, 0.82);
+      border-color: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+    .harper-card .harper-msg { color: #aaaaaa; }
+    .harper-card .harper-btn {
+      border-color: #505860;
+      background: #343a44;
+      color: #c9d1d9;
+    }
+    .harper-card .harper-btn:hover {
+      background: #404850;
+      border-color: #5a6570;
+    }
+  }
+`;
+
+function createTooltip(view: EditorView, diagnostic: Diagnostic) {
+  const color = colorForKind(diagnostic.lintKind);
+
+  if (!document.getElementById('harper-card-styles')) {
+    const style = document.createElement('style');
+    style.id = 'harper-card-styles';
+    style.textContent = cardCSS;
+    document.head.appendChild(style);
+  }
+
+  const dom = document.createElement('div');
+  dom.className = 'harper-card';
 
   const content = document.createElement('div');
-  content.style.padding = '12px 14px';
+  content.style.padding = '14px 12px';
 
   const badge = document.createElement('span');
   badge.style.cssText = `
@@ -128,10 +170,10 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   content.appendChild(badge);
 
   const msg = document.createElement('div');
+  msg.className = 'harper-msg';
   msg.style.cssText = `
     font-size: 13px;
     line-height: 1.5;
-    color: ${isDark ? '#aaaaaa' : '#444444'};
     margin-bottom: 10px;
   `;
   msg.textContent = diagnostic.message;
@@ -143,7 +185,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
     for (const action of diagnostic.actions) {
       const btn = document.createElement('button');
-      btn.style.cssText = buttonStyle(isDark);
+      btn.className = 'harper-btn';
       btn.textContent = action.name;
       btn.onmousedown = (e) => {
         e.preventDefault();
@@ -153,13 +195,6 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
         if (current) {
           action.apply(view, current.from, current.to);
         }
-      };
-      btn.onmouseenter = () => {
-        btn.style.background = isDark ? '#404850' : '#eaeef2';
-        btn.style.borderColor = isDark ? '#5a6570' : '#afb8c1';
-      };
-      btn.onmouseleave = () => {
-        btn.style.cssText = buttonStyle(isDark);
       };
       actions.appendChild(btn);
     }
@@ -180,19 +215,4 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       }
     },
   };
-}
-
-function buttonStyle(isDark: boolean): string {
-  return `
-    padding: 4px 12px;
-    border: 1px solid ${isDark ? '#505860' : '#d0d7de'};
-    border-radius: 6px;
-    background: ${isDark ? '#343a44' : '#f6f8fa'};
-    color: ${isDark ? '#c9d1d9' : '#24292f'};
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: inherit;
-    line-height: 1.4;
-  `;
 }
