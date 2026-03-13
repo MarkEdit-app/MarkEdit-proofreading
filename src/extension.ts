@@ -16,7 +16,7 @@ const kindStyleInjector = ViewPlugin.define(() => {
     style.textContent = kindCSS();
     document.head.appendChild(style);
   }
-  return { update() {} };
+  return {};
 });
 
 const lintScheduler = ViewPlugin.fromClass(class {

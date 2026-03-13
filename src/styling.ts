@@ -65,7 +65,7 @@ export function kindCSS(): string {
   css += '@media (prefers-color-scheme: dark) {\n';
   css += `  .cm-harper-lint { text-decoration: underline solid ${fallbackDark} 2px; background-color: ${fallbackDark}22; }\n`;
   css += `  .harper-badge { color: ${fallbackDark}; background-color: ${fallbackDark}22; }\n`;
-  for (const [kind] of Object.entries(kindColors)) {
+  for (const kind of Object.keys(kindColors)) {
     const dark = kindColorsDark[kind] ?? kindColors[kind];
     css += `  .cm-harper-lint[data-lint-kind="${kind}"] { text-decoration: underline solid ${dark} 2px; background-color: ${dark}22; }\n`;
     css += `  .harper-badge[data-kind="${kind}"] { color: ${dark}; background-color: ${dark}22; }\n`;
