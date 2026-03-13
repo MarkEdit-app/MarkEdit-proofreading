@@ -45,7 +45,7 @@ export function disabledLintKindsFor(preset: LintPreset): Set<string> {
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {
-  if (value === 'strict' || value === 'relaxed') {
+  if (value === 'strict' || value === 'standard' || value === 'relaxed') {
     return value;
   }
 
