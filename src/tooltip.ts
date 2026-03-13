@@ -91,17 +91,18 @@ const cardCSS = `
   }
   .harper-card .harper-close {
     position: absolute;
-    top: 4px;
-    right: 6px;
+    top: 6px;
+    right: 8px;
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 20px;
-    line-height: 1;
     color: #888;
     padding: 4px;
-    font-family: inherit;
+    line-height: 0;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .harper-card .harper-close:hover { color: #444; }
   .harper-card .harper-msg { color: #444444; }
@@ -188,7 +189,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   // Close button at card level (top-right corner)
   const close = document.createElement('button');
   close.className = 'harper-close';
-  close.textContent = '✕';
+  close.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
   close.ariaLabel = 'Close';
   close.onmousedown = (e) => e.preventDefault();
   close.onclick = () => {
