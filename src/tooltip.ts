@@ -89,15 +89,15 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   const isDark = view.state.facet(EditorView.darkTheme);
   const color = colorForKind(diagnostic.lintKind);
 
-  // Card container — all visual styles applied here, not on the CM6 wrapper
+  // Outer card — visual styles only, no padding (CM6 may strip padding from this element)
   const dom = document.createElement('div');
   dom.style.cssText = `
     border-radius: 10px;
     overflow: hidden;
-    padding: 12px 14px;
     max-width: 360px;
     min-width: 180px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+    user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     background: ${isDark ? 'rgba(40, 40, 40, 0.82)' : 'rgba(255, 255, 255, 0.85)'};
@@ -109,7 +109,10 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       : '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)'};
   `;
 
-  // Badge
+  // Inner content wrapper — padding lives here, safe from CM6 interference
+  const content = document.createElement('div');
+  content.style.padding = '12px 14px';
+
   const badge = document.createElement('span');
   badge.style.cssText = `
     display: inline-block;
@@ -123,9 +126,8 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     color: ${color};
   `;
   badge.textContent = diagnostic.title;
-  dom.appendChild(badge);
+  content.appendChild(badge);
 
-  // Message
   const msg = document.createElement('div');
   msg.style.cssText = `
     font-size: 13px;
@@ -134,9 +136,8 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     margin-bottom: 10px;
   `;
   msg.textContent = diagnostic.message;
-  dom.appendChild(msg);
+  content.appendChild(msg);
 
-  // Action buttons
   if (diagnostic.actions.length > 0) {
     const actions = document.createElement('div');
     actions.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px;';
@@ -178,13 +179,14 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       actions.appendChild(btn);
     }
 
-    dom.appendChild(actions);
+    content.appendChild(actions);
   }
+
+  dom.appendChild(content);
 
   return {
     dom,
     mount() {
-      // Strip the CM6 tooltip wrapper's default border/background
       const wrapper = dom.closest('.cm-tooltip') as HTMLElement | null;
       if (wrapper) {
         wrapper.style.background = 'transparent';
