@@ -3,7 +3,7 @@ import type { ViewUpdate } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect, lintToDiagnostic } from './decoration';
-import { lintTooltip } from './tooltip';
+import { clickTooltipField, tooltipHandlers } from './tooltip';
 import { baseTheme } from './styling';
 import { lint } from './lint';
 
@@ -45,5 +45,5 @@ const lintScheduler = ViewPlugin.fromClass(class {
 });
 
 export function proofreadingExtension(): Extension {
-  return [diagnosticsField, lintScheduler, lintTooltip, baseTheme];
+  return [diagnosticsField, lintScheduler, clickTooltipField, tooltipHandlers, baseTheme];
 }
