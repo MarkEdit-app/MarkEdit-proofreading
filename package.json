@@ -5,6 +5,7 @@
   "scripts": {
     "build": "vite build",
     "lint": "eslint .",
+    "test": "vitest run",
     "reload": "osascript -e 'quit app \"MarkEdit\"' -e 'delay 1' -e 'launch app \"MarkEdit\"'",
     "uninstall": "rm ~/Library/Containers/app.cyan.markedit/Data/Documents/scripts/$(node -p \"require('./package.json').name\").js"
   },
@@ -23,6 +24,7 @@
     "markedit-vite": "https://github.com/MarkEdit-app/MarkEdit-vite#v0.4.0",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.57.0",
+    "vitest": "^3.2.4",
     "vite": "^7.0.0",
     "vite-plugin-singlefile": "^2.3.0"
   },
