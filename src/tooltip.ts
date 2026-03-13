@@ -3,7 +3,7 @@ import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
-import { lintKindColor } from './styling';
+import { lintKindColor, applyCardContainerStyles } from './styling';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
@@ -135,6 +135,7 @@ function createTooltipDOM(view: EditorView, diagnostic: Diagnostic) {
       const parent = dom.parentElement;
       if (parent) {
         parent.classList.add('cm-harper-card');
+        applyCardContainerStyles(parent, view);
       }
     },
   };

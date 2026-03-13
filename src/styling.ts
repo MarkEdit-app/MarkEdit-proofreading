@@ -41,30 +41,38 @@ export function lintKindTextColor(kind: string): 'black' | 'white' {
   return luminance > 0.5 ? 'black' : 'white';
 }
 
+/** Apply card container styles directly to the tooltip element for reliable rendering. */
+export function applyCardContainerStyles(el: HTMLElement, view: EditorView) {
+  const isDark = view.state.facet(EditorView.darkTheme);
+  const s = el.style;
+
+  s.borderRadius = '10px';
+  s.overflow = 'hidden';
+  s.padding = '0';
+  s.userSelect = 'none';
+  (s as unknown as Record<string, string>).WebkitUserSelect = 'none';
+  (s as unknown as Record<string, string>).WebkitTouchCallout = 'none';
+
+  if (isDark) {
+    s.border = '1px solid rgba(255, 255, 255, 0.1)';
+    s.background = 'rgba(40, 40, 40, 0.82)';
+    s.backdropFilter = 'blur(20px)';
+    (s as unknown as Record<string, string>).WebkitBackdropFilter = 'blur(20px)';
+    s.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)';
+  } else {
+    s.border = '1px solid rgba(0, 0, 0, 0.1)';
+    s.background = 'rgba(255, 255, 255, 0.85)';
+    s.backdropFilter = 'blur(20px)';
+    (s as unknown as Record<string, string>).WebkitBackdropFilter = 'blur(20px)';
+    s.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)';
+  }
+}
+
 export const baseTheme = EditorView.baseTheme({
   // Base lint decoration
   '.cm-harper-lint': {
     cursor: 'default',
     borderRadius: '2px',
-  },
-  // Tooltip card container (class added via mount callback)
-  '.cm-harper-card.cm-tooltip': {
-    borderRadius: '10px',
-    border: '1px solid rgba(0, 0, 0, 0.1)',
-    background: 'rgba(255, 255, 255, 0.85)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)',
-    padding: '0',
-    overflow: 'hidden',
-    userSelect: 'none',
-    WebkitUserSelect: 'none',
-    WebkitTouchCallout: 'none',
-  },
-  '&dark .cm-harper-card.cm-tooltip': {
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    background: 'rgba(40, 40, 40, 0.82)',
-    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)',
   },
   // Tooltip content
   '.cm-harper-tooltip': {
