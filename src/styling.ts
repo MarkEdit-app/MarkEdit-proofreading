@@ -1,7 +1,7 @@
 import { EditorView } from '@codemirror/view';
 
-// Official Harper lint kind color map — matches packages/lint-framework/src/lint/lintKindColor.ts
-const LINT_KIND_COLORS: Record<string, string> = {
+// Harper lint kind → color, from packages/lint-framework/src/lint/lintKindColor.ts
+const kindColors: Record<string, string> = {
   Agreement: '#228B22',
   BoundaryError: '#8B4513',
   Capitalization: '#540D6E',
@@ -24,48 +24,8 @@ const LINT_KIND_COLORS: Record<string, string> = {
   WordChoice: '#228B22',
 };
 
-const FALLBACK_COLOR = '#6c757d';
-
-export function lintKindColor(kind: string): string {
-  return LINT_KIND_COLORS[kind] ?? FALLBACK_COLOR;
-}
-
-/** Returns 'black' or 'white' depending on which contrasts better with the given hex color. */
-export function lintKindTextColor(kind: string): 'black' | 'white' {
-  const hex = lintKindColor(kind).replace('#', '');
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-  // Relative luminance formula
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.5 ? 'black' : 'white';
-}
-
-/** Apply card container styles directly to the tooltip element for reliable rendering. */
-export function applyCardContainerStyles(el: HTMLElement, view: EditorView) {
-  const isDark = view.state.facet(EditorView.darkTheme);
-  const s = el.style;
-
-  s.borderRadius = '10px';
-  s.overflow = 'hidden';
-  s.padding = '0';
-  s.userSelect = 'none';
-  (s as unknown as Record<string, string>).WebkitUserSelect = 'none';
-  (s as unknown as Record<string, string>).WebkitTouchCallout = 'none';
-
-  if (isDark) {
-    s.border = '1px solid rgba(255, 255, 255, 0.1)';
-    s.background = 'rgba(40, 40, 40, 0.82)';
-    s.backdropFilter = 'blur(20px)';
-    (s as unknown as Record<string, string>).WebkitBackdropFilter = 'blur(20px)';
-    s.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)';
-  } else {
-    s.border = '1px solid rgba(0, 0, 0, 0.1)';
-    s.background = 'rgba(255, 255, 255, 0.85)';
-    s.backdropFilter = 'blur(20px)';
-    (s as unknown as Record<string, string>).WebkitBackdropFilter = 'blur(20px)';
-    s.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)';
-  }
+export function colorForKind(kind: string): string {
+  return kindColors[kind] ?? '#6c757d';
 }
 
 export const baseTheme = EditorView.baseTheme({

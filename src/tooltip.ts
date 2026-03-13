@@ -3,7 +3,7 @@ import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
-import { lintKindColor, applyCardContainerStyles } from './styling';
+import { colorForKind } from './styling';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
@@ -23,7 +23,7 @@ export const clickTooltipField = StateField.define<Tooltip | null>({
           pos: diagnostic.from,
           above: true,
           create(view) {
-            return createTooltipDOM(view, diagnostic);
+            return createTooltip(view, diagnostic);
           },
         };
       }
@@ -85,7 +85,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
   },
 });
 
-function createTooltipDOM(view: EditorView, diagnostic: Diagnostic) {
+function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   const dom = document.createElement('div');
   dom.className = 'cm-harper-tooltip';
 
@@ -94,7 +94,7 @@ function createTooltipDOM(view: EditorView, diagnostic: Diagnostic) {
 
   const badge = document.createElement('span');
   badge.className = 'cm-harper-badge';
-  const color = lintKindColor(diagnostic.lintKind);
+  const color = colorForKind(diagnostic.lintKind);
   badge.style.backgroundColor = `${color}22`;
   badge.style.color = color;
   badge.textContent = diagnostic.title;
@@ -133,10 +133,26 @@ function createTooltipDOM(view: EditorView, diagnostic: Diagnostic) {
     dom,
     mount() {
       const parent = dom.parentElement;
-      if (parent) {
-        parent.classList.add('cm-harper-card');
-        applyCardContainerStyles(parent, view);
-      }
+      if (!parent) return;
+
+      parent.classList.add('cm-harper-card');
+      const isDark = view.state.facet(EditorView.darkTheme);
+
+      parent.style.cssText = `
+        border-radius: 10px;
+        overflow: hidden;
+        padding: 0;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        border: 1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'};
+        background: ${isDark ? 'rgba(40,40,40,0.82)' : 'rgba(255,255,255,0.85)'};
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: ${isDark
+          ? '0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(0,0,0,0.2)'
+          : '0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06)'};
+      `;
     },
   };
 }
