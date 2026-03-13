@@ -1,10 +1,13 @@
 import type { LintConfig } from 'harper.js';
+import type { MarkEdit } from 'markedit-api';
 
-const settingsKey = 'markedit-proofreading';
+const settingsKey = 'extension.markeditProofreading';
 
 export const conservativeDisabledLintKinds = ['Enhancement', 'Readability', 'Repetition', 'Style', 'WordChoice'] as const;
 
 type LintProfile = 'all' | 'conservative';
+type JSONObject = MarkEdit['userSettings'];
+type JSONValue = JSONObject[string];
 
 export interface ProofreadingSettings {
   lintProfile: LintProfile;
@@ -12,7 +15,7 @@ export interface ProofreadingSettings {
   disabledLintKinds: string[];
 }
 
-export function getProofreadingSettings(userSettings: unknown): ProofreadingSettings {
+export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
   const defaults: ProofreadingSettings = {
     lintProfile: 'conservative',
     lintRules: {},
@@ -43,13 +46,14 @@ export function disabledLintKindsFor(settings: ProofreadingSettings): Set<string
   return new Set([...disabled, ...settings.disabledLintKinds]);
 }
 
-function asObject(value: unknown): Record<string, unknown> | undefined {
+function asObject(value: JSONValue | undefined): JSONObject | undefined {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     return undefined;
   }
-  return value as Record<string, unknown>;
+
+  return value as JSONObject;
 }
 
-function isLintRuleValue(value: unknown): value is boolean | null {
+function isLintRuleValue(value: JSONValue): value is boolean | null {
   return typeof value === 'boolean' || value === null;
 }

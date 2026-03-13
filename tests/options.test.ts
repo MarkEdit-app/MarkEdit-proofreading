@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { conservativeDisabledLintKinds, disabledLintKindsFor, getProofreadingSettings } from '../src/options';
+import { conservativeDisabledLintKinds, disabledLintKindsFor, getProofreadingSettings } from '../src/settings';
 
 describe('proofreading options', () => {
   it('uses conservative defaults when no settings are provided', () => {
@@ -13,7 +13,7 @@ describe('proofreading options', () => {
 
   it('parses lint profile, per-rule overrides, and disabled kinds from user settings', () => {
     const settings = getProofreadingSettings({
-      'markedit-proofreading': {
+      'extension.markeditProofreading': {
         lintProfile: 'all',
         lintRules: {
           SpelledNumbers: true,

@@ -1,12 +1,12 @@
 import { LocalLinter, binaryInlined } from 'harper.js';
 import { MarkEdit } from 'markedit-api';
-import { disabledLintKindsFor, getProofreadingSettings } from './options';
+import { disabledLintKindsFor, getProofreadingSettings } from './settings';
 
 const linter = new LocalLinter({ binary: binaryInlined });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
 const disabledLintKinds = disabledLintKindsFor(settings);
 const configureLinterPromise = applyLintRules().catch(error => {
-  console.warn('[markedit-proofreading] Failed to apply lintRules from settings.json (markedit-proofreading.lintRules).', error);
+  console.warn('[markedit-proofreading] Failed to apply lintRules from settings.json (extension.markeditProofreading.lintRules).', error);
 });
 
 export async function lint(text: string) {
