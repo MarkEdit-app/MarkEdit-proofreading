@@ -75,6 +75,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
 
 const cardCSS = `
   .harper-card {
+    position: relative;
     border-radius: 10px;
     overflow: hidden;
     max-width: 320px;
@@ -83,11 +84,16 @@ const cardCSS = `
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.9);
+    background: transparent;
     border: 1px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+  .harper-card .harper-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.88);
+    pointer-events: none;
   }
   .harper-card .harper-close {
     position: absolute;
@@ -147,9 +153,11 @@ const cardCSS = `
   .harper-card .harper-ignore:hover { background: #eaeef2; border-color: #afb8c1; color: #24292f; }
   @media (prefers-color-scheme: dark) {
     .harper-card {
-      background: rgba(40, 40, 40, 0.9);
       border-color: rgba(255, 255, 255, 0.2) !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+    .harper-card .harper-bg {
+      background: rgba(40, 40, 40, 0.88);
     }
     .harper-card .harper-close { color: #777; }
     .harper-card .harper-close:hover { color: #bbb; }
@@ -183,7 +191,11 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
   const dom = document.createElement('div');
   dom.className = 'harper-card';
-  dom.style.position = 'relative';
+
+  // Background layer for translucent blended color
+  const bg = document.createElement('div');
+  bg.className = 'harper-bg';
+  dom.appendChild(bg);
 
   // Close button at card level (top-right corner)
   const close = document.createElement('button');
@@ -197,7 +209,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   dom.appendChild(close);
 
   const content = document.createElement('div');
-  content.style.padding = '12px';
+  content.style.cssText = 'position: relative; padding: 12px;';
 
   // Header: badge only
   const badge = document.createElement('span');
