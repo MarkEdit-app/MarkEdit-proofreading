@@ -3,7 +3,6 @@ import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
-import { colorForKind } from './styling';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
@@ -127,8 +126,6 @@ const cardCSS = `
 `;
 
 function createTooltip(view: EditorView, diagnostic: Diagnostic) {
-  const color = colorForKind(diagnostic.lintKind);
-
   if (!document.getElementById('harper-card-styles')) {
     const style = document.createElement('style');
     style.id = 'harper-card-styles';
@@ -143,6 +140,8 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   content.style.padding = '12px';
 
   const badge = document.createElement('span');
+  badge.className = 'harper-badge';
+  badge.setAttribute('data-kind', diagnostic.lintKind);
   badge.style.cssText = `
     display: inline-block;
     padding: 2px 8px;
@@ -151,8 +150,6 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     font-weight: 600;
     letter-spacing: 0.2px;
     margin-bottom: 6px;
-    background-color: ${color}22;
-    color: ${color};
   `;
   badge.textContent = diagnostic.title;
   content.appendChild(badge);

@@ -3,7 +3,6 @@ import type { DecorationSet } from '@codemirror/view';
 import { StateField, StateEffect } from '@codemirror/state';
 import { SuggestionKind } from 'harper.js';
 import type { Lint, Suggestion } from 'harper.js';
-import { colorForKind } from './styling';
 
 export interface Diagnostic {
   from: number;
@@ -36,16 +35,9 @@ export const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; d
         const ranges = diagnostics
           .filter(d => d.from < d.to)
           .map(d => {
-            const color = colorForKind(d.lintKind);
             return Decoration.mark({
               class: 'cm-harper-lint',
-              attributes: {
-                style: [
-                  `text-decoration: underline solid ${color} 2px`,
-                  'text-underline-offset: 3px',
-                  `background-color: ${color}22`,
-                ].join('; '),
-              },
+              attributes: { 'data-lint-kind': d.lintKind },
             }).range(d.from, d.to);
           });
 
