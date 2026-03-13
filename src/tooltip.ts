@@ -79,14 +79,14 @@ const cardCSS = `
     overflow: hidden;
     max-width: 360px;
     min-width: 180px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    background: rgba(255, 255, 255, 0.9);
+    border: 0.5px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   }
   .harper-card .harper-header {
@@ -115,7 +115,7 @@ const cardCSS = `
     background: rgba(0, 0, 0, 0.06);
   }
   .harper-card .harper-btn {
-    padding: 4px 12px;
+    padding: 3px 6px;
     border: 1px solid #d0d7de;
     border-radius: 6px;
     background: #f6f8fa;
@@ -146,7 +146,7 @@ const cardCSS = `
   .harper-card .harper-ignore:hover { color: #555; background: rgba(0,0,0,0.05); }
   @media (prefers-color-scheme: dark) {
     .harper-card {
-      background: rgba(40, 40, 40, 0.82);
+      background: rgba(40, 40, 40, 0.9);
       border-color: rgba(255, 255, 255, 0.2) !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
     }
@@ -185,7 +185,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   dom.className = 'harper-card';
 
   const content = document.createElement('div');
-  content.style.padding = '12px';
+  content.style.padding = '15px';
 
   // Header: badge + close button
   const header = document.createElement('div');
@@ -197,7 +197,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   badge.style.cssText = `
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 4px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.2px;
