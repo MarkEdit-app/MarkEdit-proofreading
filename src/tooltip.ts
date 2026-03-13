@@ -1,7 +1,7 @@
 import { StateField, StateEffect } from '@codemirror/state';
 import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
-import { diagnosticsField } from './decoration';
+import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
@@ -89,7 +89,31 @@ const cardCSS = `
     border: 1px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   }
+  .harper-card .harper-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .harper-card .harper-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    color: #888;
+    padding: 0 0 0 8px;
+    font-family: inherit;
+    flex-shrink: 0;
+  }
+  .harper-card .harper-close:hover { color: #444; }
   .harper-card .harper-msg { color: #444444; }
+  .harper-card .harper-msg code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.06);
+  }
   .harper-card .harper-btn {
     padding: 4px 12px;
     border: 1px solid #d0d7de;
@@ -106,13 +130,30 @@ const cardCSS = `
     background: #eaeef2;
     border-color: #afb8c1;
   }
+  .harper-card .harper-ignore {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 1.4;
+    margin-left: auto;
+  }
+  .harper-card .harper-ignore:hover { color: #555; background: rgba(0,0,0,0.05); }
   @media (prefers-color-scheme: dark) {
     .harper-card {
       background: rgba(40, 40, 40, 0.82);
       border-color: rgba(255, 255, 255, 0.2) !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
     }
+    .harper-card .harper-close { color: #777; }
+    .harper-card .harper-close:hover { color: #bbb; }
     .harper-card .harper-msg { color: #aaaaaa; }
+    .harper-card .harper-msg code { background: rgba(255, 255, 255, 0.08); }
     .harper-card .harper-btn {
       border-color: #505860;
       background: #343a44;
@@ -122,8 +163,15 @@ const cardCSS = `
       background: #404850;
       border-color: #5a6570;
     }
+    .harper-card .harper-ignore { color: #777; }
+    .harper-card .harper-ignore:hover { color: #bbb; background: rgba(255,255,255,0.06); }
   }
 `;
+
+function renderMessage(text: string): string {
+  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
 
 function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   if (!document.getElementById('harper-card-styles')) {
@@ -139,6 +187,10 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   const content = document.createElement('div');
   content.style.padding = '12px';
 
+  // Header: badge + close button
+  const header = document.createElement('div');
+  header.className = 'harper-header';
+
   const badge = document.createElement('span');
   badge.className = 'harper-badge';
   badge.setAttribute('data-kind', diagnostic.lintKind);
@@ -149,44 +201,69 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.2px;
-    margin-bottom: 6px;
   `;
   badge.textContent = diagnostic.title;
-  content.appendChild(badge);
+  header.appendChild(badge);
 
+  const close = document.createElement('button');
+  close.className = 'harper-close';
+  close.textContent = '✕';
+  close.onmousedown = (e) => e.preventDefault();
+  close.onclick = () => {
+    view.dispatch({ effects: setClickTooltip.of(null) });
+  };
+  header.appendChild(close);
+
+  content.appendChild(header);
+
+  // Message with HTML rendering
   const msg = document.createElement('div');
   msg.className = 'harper-msg';
   msg.style.cssText = `
     font-size: 13px;
     line-height: 1.5;
-    margin-bottom: 10px;
+    margin: 8px 0 10px;
   `;
-  msg.textContent = diagnostic.message;
+  msg.innerHTML = renderMessage(diagnostic.message);
   content.appendChild(msg);
 
-  if (diagnostic.actions.length > 0) {
-    const actions = document.createElement('div');
-    actions.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px;';
+  // Actions: suggestion buttons + Ignore
+  const actions = document.createElement('div');
+  actions.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; align-items: center;';
 
-    for (const action of diagnostic.actions) {
-      const btn = document.createElement('button');
-      btn.className = 'harper-btn';
-      btn.textContent = action.name;
-      btn.onmousedown = (e) => e.preventDefault();
-      btn.onclick = () => {
-        const current = view.state.field(diagnosticsField).diagnostics.find(d =>
-          d.from === diagnostic.from && d.to === diagnostic.to,
-        );
-        if (current) {
-          action.apply(view, current.from, current.to);
-        }
-      };
-      actions.appendChild(btn);
-    }
-
-    content.appendChild(actions);
+  for (const action of diagnostic.actions) {
+    const btn = document.createElement('button');
+    btn.className = 'harper-btn';
+    btn.textContent = action.name;
+    btn.onmousedown = (e) => e.preventDefault();
+    btn.onclick = () => {
+      const current = view.state.field(diagnosticsField).diagnostics.find(d =>
+        d.from === diagnostic.from && d.to === diagnostic.to,
+      );
+      if (current) {
+        action.apply(view, current.from, current.to);
+      }
+    };
+    actions.appendChild(btn);
   }
 
+  const ignore = document.createElement('button');
+  ignore.className = 'harper-ignore';
+  ignore.textContent = 'Ignore';
+  ignore.onmousedown = (e) => e.preventDefault();
+  ignore.onclick = () => {
+    const { diagnostics } = view.state.field(diagnosticsField);
+    const filtered = diagnostics.filter(d => !(d.from === diagnostic.from && d.to === diagnostic.to));
+    view.dispatch({
+      effects: [
+        setClickTooltip.of(null),
+        setDiagnosticsEffect.of(filtered),
+      ],
+    });
+  };
+  actions.appendChild(ignore);
+
+  content.appendChild(actions);
   dom.appendChild(content);
 
   return {
