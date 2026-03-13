@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { SuggestionKind } from 'harper.js';
+import { Lint, SuggestionKind } from 'harper.js';
 import { lintToDiagnostic } from '../src/decoration';
+import { EditorView } from '@codemirror/view';
 
 function makeSuggestion(kind: SuggestionKind, replacement: string) {
   return {
@@ -8,17 +9,6 @@ function makeSuggestion(kind: SuggestionKind, replacement: string) {
     get_replacement_text: () => replacement,
   };
 }
-
-type LintStub = {
-  span: () => { start: number; end: number };
-  lint_kind: () => string;
-  lint_kind_pretty: () => string;
-  message_html: () => string;
-  suggestions: () => ReturnType<typeof makeSuggestion>[];
-};
-
-
-
 
 describe('lintToDiagnostic', () => {
   it('maps lint fields and creates action labels', () => {
@@ -34,7 +24,7 @@ describe('lintToDiagnostic', () => {
       ],
     };
 
-    const diagnostic = lintToDiagnostic(lint as unknown as LintStub);
+    const diagnostic = lintToDiagnostic(lint as Lint);
 
     expect(diagnostic).toMatchObject({
       from: 1,
@@ -43,6 +33,7 @@ describe('lintToDiagnostic', () => {
       title: 'Style',
       messageHtml: '<p>Use another word</p>',
     });
+
     expect(diagnostic.actions.map(a => a.name)).toEqual(['Remove', 'Insert "ed"', 'fixed']);
   });
 
@@ -58,22 +49,25 @@ describe('lintToDiagnostic', () => {
         makeSuggestion(SuggestionKind.InsertAfter, '!'),
       ],
     };
-    const diagnostic = lintToDiagnostic(lint as unknown as LintStub);
-    const dispatch = vi.fn();
-    const view = { dispatch };
 
-    diagnostic.actions[0].apply(view as any, 2, 6);
-    diagnostic.actions[1].apply(view as any, 2, 6);
-    diagnostic.actions[2].apply(view as any, 2, 6);
+    const diagnostic = lintToDiagnostic(lint as Lint);
+    const dispatch = vi.fn();
+    const view = { dispatch } as unknown as EditorView;
+
+    diagnostic.actions[0].apply(view, 2, 6);
+    diagnostic.actions[1].apply(view, 2, 6);
+    diagnostic.actions[2].apply(view, 2, 6);
 
     expect(dispatch).toHaveBeenNthCalledWith(1, {
       changes: { from: 2, to: 6, insert: '' },
       selection: { anchor: 2 },
     });
+
     expect(dispatch).toHaveBeenNthCalledWith(2, {
       changes: { from: 2, to: 6, insert: 'word' },
       selection: { anchor: 6 },
     });
+
     expect(dispatch).toHaveBeenNthCalledWith(3, {
       changes: { from: 6, to: 6, insert: '!' },
       selection: { anchor: 7 },
