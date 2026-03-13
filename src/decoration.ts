@@ -9,7 +9,6 @@ export interface Diagnostic {
   to: number;
   lintKind: string;
   title: string;
-  message: string;
   messageHtml: string;
   actions: DiagnosticAction[];
 }
@@ -59,7 +58,6 @@ export function lintToDiagnostic(l: Lint): Diagnostic {
     to: span.end,
     lintKind: l.lint_kind(),
     title: l.lint_kind_pretty(),
-    message: l.message(),
     messageHtml: l.message_html(),
     actions: l.suggestions().map(suggestionToAction),
   };
