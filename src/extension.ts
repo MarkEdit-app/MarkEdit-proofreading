@@ -3,11 +3,21 @@ import type { ViewUpdate } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect, lintToDiagnostic } from './decoration';
-import { lintTooltip } from './tooltip';
-import { baseTheme } from './styling';
+import { clickTooltipField, tooltipHandlers } from './tooltip';
+import { baseTheme, kindCSS } from './styling';
 import { lint } from './lint';
 
 const lintDelay = 500;
+
+const kindStyleInjector = ViewPlugin.define(() => {
+  if (!document.getElementById('harper-kind-styles')) {
+    const style = document.createElement('style');
+    style.id = 'harper-kind-styles';
+    style.textContent = kindCSS();
+    document.head.appendChild(style);
+  }
+  return {};
+});
 
 const lintScheduler = ViewPlugin.fromClass(class {
   private timeout: ReturnType<typeof setTimeout> | undefined;
@@ -45,5 +55,5 @@ const lintScheduler = ViewPlugin.fromClass(class {
 });
 
 export function proofreadingExtension(): Extension {
-  return [diagnosticsField, lintScheduler, lintTooltip, baseTheme];
+  return [diagnosticsField, lintScheduler, clickTooltipField, tooltipHandlers, baseTheme, kindStyleInjector];
 }

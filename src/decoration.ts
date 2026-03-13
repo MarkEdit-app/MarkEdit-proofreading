@@ -7,8 +7,9 @@ import type { Lint, Suggestion } from 'harper.js';
 export interface Diagnostic {
   from: number;
   to: number;
+  lintKind: string;
   title: string;
-  message: string;
+  messageHtml: string;
   actions: DiagnosticAction[];
 }
 
@@ -33,7 +34,12 @@ export const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; d
         const diagnostics = effect.value;
         const ranges = diagnostics
           .filter(d => d.from < d.to)
-          .map(d => Decoration.mark({ class: 'cm-harper-lint' }).range(d.from, d.to));
+          .map(d => {
+            return Decoration.mark({
+              class: 'cm-harper-lint',
+              attributes: { 'data-lint-kind': d.lintKind },
+            }).range(d.from, d.to);
+          });
 
         value = { diagnostics, decorations: Decoration.set(ranges, true) };
       }
@@ -50,8 +56,9 @@ export function lintToDiagnostic(l: Lint): Diagnostic {
   return {
     from: span.start,
     to: span.end,
+    lintKind: l.lint_kind(),
     title: l.lint_kind_pretty(),
-    message: l.message(),
+    messageHtml: l.message_html(),
     actions: l.suggestions().map(suggestionToAction),
   };
 }
