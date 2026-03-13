@@ -86,7 +86,7 @@ const cardCSS = `
     -webkit-touch-callout: none;
     background: rgba(255, 255, 255, 0.4);
     border: 1px solid rgba(0, 0, 0, 0.2) !important;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18), 0 1px 6px rgba(0, 0, 0, 0.1);
   }
   .harper-card .harper-bg {
     position: absolute;
@@ -157,7 +157,7 @@ const cardCSS = `
     .harper-card {
       background: rgba(40, 40, 40, 0.4);
       border-color: rgba(255, 255, 255, 0.2) !important;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), 0 1px 6px rgba(0, 0, 0, 0.3);
     }
     .harper-card .harper-bg {
       background: rgba(40, 40, 40, 0.7);
