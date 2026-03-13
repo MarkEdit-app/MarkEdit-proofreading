@@ -1,7 +1,7 @@
 import { EditorView, showTooltip, type Tooltip } from '@codemirror/view';
 import { StateField } from '@codemirror/state';
 import { SuggestionKind } from 'harper.js';
-import { diagnosticsField, setDiagnostics } from './decorations';
+import { diagnosticsField } from './decorations';
 import type { Diagnostic } from './lint';
 
 function createTooltipContent(view: EditorView, diagnostic: Diagnostic): HTMLElement {
@@ -26,13 +26,13 @@ function createTooltipContent(view: EditorView, diagnostic: Diagnostic): HTMLEle
       if (kind === SuggestionKind.Remove) {
         button.textContent = 'Remove';
       } else {
-        const text = suggestion.get_replacement_text();
-        button.textContent = text || 'Remove';
+        button.textContent = suggestion.get_replacement_text();
       }
 
+      const replacement = kind === SuggestionKind.Remove ? '' : suggestion.get_replacement_text();
       button.addEventListener('click', () => {
         view.dispatch({
-          changes: { from: diagnostic.from, to: diagnostic.to, insert: suggestion.get_replacement_text() },
+          changes: { from: diagnostic.from, to: diagnostic.to, insert: replacement },
         });
       });
 
@@ -79,13 +79,4 @@ export const tooltipField = StateField.define<Tooltip | null>({
   provide(field) {
     return showTooltip.from(field);
   },
-});
-
-export const dismissTooltipOnEdit = EditorView.updateListener.of(update => {
-  if (update.docChanged) {
-    const { diagnostics } = update.state.field(diagnosticsField);
-    if (diagnostics.length === 0) {
-      update.view.dispatch({ effects: setDiagnostics.of([]) });
-    }
-  }
 });

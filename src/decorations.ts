@@ -26,7 +26,7 @@ export const diagnosticsField = StateField.define<{ decorations: DecorationSet; 
     }
 
     if (tr.docChanged) {
-      return { decorations: value.decorations.map(tr.changes), diagnostics: [] };
+      return { decorations: Decoration.none, diagnostics: [] };
     }
 
     return value;

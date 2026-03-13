@@ -2,19 +2,19 @@ import { EditorView } from '@codemirror/view';
 import { MarkEdit } from 'markedit-api';
 import { lint } from './src/lint';
 import { diagnosticsField, setDiagnostics } from './src/decorations';
-import { tooltipField, dismissTooltipOnEdit } from './src/tooltip';
+import { tooltipField } from './src/tooltip';
 import { styles } from './src/styles';
 
-let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 const debounceDelay = 500;
+const debounceTimers = new WeakMap<EditorView, ReturnType<typeof setTimeout>>();
 
 function scheduleLint(view: EditorView) {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(async () => {
+  clearTimeout(debounceTimers.get(view));
+  debounceTimers.set(view, setTimeout(async () => {
     const text = view.state.doc.toString();
     const diagnostics = await lint(text);
     view.dispatch({ effects: setDiagnostics.of(diagnostics) });
-  }, debounceDelay);
+  }, debounceDelay));
 }
 
 const lintOnUpdate = EditorView.updateListener.of(update => {
@@ -30,7 +30,6 @@ MarkEdit.onEditorReady(editorView => {
 MarkEdit.addExtension([
   diagnosticsField,
   tooltipField,
-  dismissTooltipOnEdit,
   lintOnUpdate,
   styles,
 ]);
