@@ -89,21 +89,19 @@ const cardCSS = `
     border: 0.5px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   }
-  .harper-card .harper-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
   .harper-card .harper-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
     background: none;
     border: none;
     cursor: pointer;
     font-size: 16px;
     line-height: 1;
     color: #888;
-    padding: 0 0 0 8px;
+    padding: 4px;
     font-family: inherit;
-    flex-shrink: 0;
+    z-index: 1;
   }
   .harper-card .harper-close:hover { color: #444; }
   .harper-card .harper-msg { color: #444444; }
@@ -131,11 +129,11 @@ const cardCSS = `
     border-color: #afb8c1;
   }
   .harper-card .harper-ignore {
-    padding: 4px 12px;
-    border: none;
+    padding: 3px 6px;
+    border: 1px solid #d0d7de;
     border-radius: 6px;
-    background: transparent;
-    color: #888;
+    background: #f6f8fa;
+    color: #656d76;
     cursor: pointer;
     font-size: 12px;
     font-weight: 500;
@@ -143,7 +141,7 @@ const cardCSS = `
     line-height: 1.4;
     margin-left: auto;
   }
-  .harper-card .harper-ignore:hover { color: #555; background: rgba(0,0,0,0.05); }
+  .harper-card .harper-ignore:hover { background: #eaeef2; border-color: #afb8c1; color: #24292f; }
   @media (prefers-color-scheme: dark) {
     .harper-card {
       background: rgba(40, 40, 40, 0.9);
@@ -163,15 +161,14 @@ const cardCSS = `
       background: #404850;
       border-color: #5a6570;
     }
-    .harper-card .harper-ignore { color: #777; }
-    .harper-card .harper-ignore:hover { color: #bbb; background: rgba(255,255,255,0.06); }
+    .harper-card .harper-ignore {
+      border-color: #505860;
+      background: #343a44;
+      color: #8b949e;
+    }
+    .harper-card .harper-ignore:hover { background: #404850; border-color: #5a6570; color: #c9d1d9; }
   }
 `;
-
-function renderMessage(text: string): string {
-  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  return escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
-}
 
 function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   if (!document.getElementById('harper-card-styles')) {
@@ -183,14 +180,22 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
   const dom = document.createElement('div');
   dom.className = 'harper-card';
+  dom.style.position = 'relative';
+
+  // Close button at card level (top-right corner)
+  const close = document.createElement('button');
+  close.className = 'harper-close';
+  close.textContent = '✕';
+  close.onmousedown = (e) => e.preventDefault();
+  close.onclick = () => {
+    view.dispatch({ effects: setClickTooltip.of(null) });
+  };
+  dom.appendChild(close);
 
   const content = document.createElement('div');
   content.style.padding = '15px';
 
-  // Header: badge + close button
-  const header = document.createElement('div');
-  header.className = 'harper-header';
-
+  // Header: badge only
   const badge = document.createElement('span');
   badge.className = 'harper-badge';
   badge.setAttribute('data-kind', diagnostic.lintKind);
@@ -203,18 +208,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     letter-spacing: 0.2px;
   `;
   badge.textContent = diagnostic.title;
-  header.appendChild(badge);
-
-  const close = document.createElement('button');
-  close.className = 'harper-close';
-  close.textContent = '✕';
-  close.onmousedown = (e) => e.preventDefault();
-  close.onclick = () => {
-    view.dispatch({ effects: setClickTooltip.of(null) });
-  };
-  header.appendChild(close);
-
-  content.appendChild(header);
+  content.appendChild(badge);
 
   // Message with HTML rendering
   const msg = document.createElement('div');
@@ -224,7 +218,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     line-height: 1.5;
     margin: 8px 0 10px;
   `;
-  msg.innerHTML = renderMessage(diagnostic.message);
+  msg.innerHTML = diagnostic.messageHtml;
   content.appendChild(msg);
 
   // Actions: suggestion buttons + Ignore
