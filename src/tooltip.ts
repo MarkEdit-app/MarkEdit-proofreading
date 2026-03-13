@@ -35,42 +35,31 @@ export const clickTooltipField = StateField.define<Tooltip | null>({
 });
 
 export const tooltipHandlers = EditorView.domEventHandlers({
-  mousedown(event, view) {
+  mousedown(event) {
     const target = event.target as HTMLElement;
     if (target.closest('.cm-tooltip')) return false;
+    if (!target.closest('.cm-harper-lint')) return false;
 
-    const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
-    if (pos === null) return false;
-
-    const { diagnostics } = view.state.field(diagnosticsField);
-    const found = diagnostics.find(d => pos >= d.from && pos <= d.to);
-
-    if (found) {
-      event.preventDefault();
-      return true;
-    }
-
-    return false;
+    event.preventDefault();
+    return true;
   },
   mouseup(event, view) {
     const target = event.target as HTMLElement;
     if (target.closest('.cm-tooltip')) return false;
 
-    const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
-    if (pos === null) {
-      if (view.state.field(clickTooltipField) !== null) {
-        view.dispatch({ effects: setClickTooltip.of(null) });
+    if (target.closest('.cm-harper-lint')) {
+      const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
+      if (pos !== null) {
+        const { diagnostics } = view.state.field(diagnosticsField);
+        const found = diagnostics.find(d => pos >= d.from && pos <= d.to);
+        if (found) {
+          view.dispatch({ effects: setClickTooltip.of(found) });
+          return true;
+        }
       }
-      return false;
     }
 
-    const { diagnostics } = view.state.field(diagnosticsField);
-    const found = diagnostics.find(d => pos >= d.from && pos <= d.to);
-
-    if (found) {
-      view.dispatch({ effects: setClickTooltip.of(found) });
-      return true;
-    } else if (view.state.field(clickTooltipField) !== null) {
+    if (view.state.field(clickTooltipField) !== null) {
       view.dispatch({ effects: setClickTooltip.of(null) });
     }
 
@@ -99,7 +88,7 @@ const cardCSS = `
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   }
   .harper-card .harper-msg { color: #444444; }
@@ -122,7 +111,7 @@ const cardCSS = `
   @media (prefers-color-scheme: dark) {
     .harper-card {
       background: rgba(40, 40, 40, 0.82);
-      border-color: rgba(255, 255, 255, 0.18);
+      border-color: rgba(255, 255, 255, 0.2) !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
     }
     .harper-card .harper-msg { color: #aaaaaa; }
@@ -152,7 +141,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   dom.className = 'harper-card';
 
   const content = document.createElement('div');
-  content.style.padding = '14px 12px';
+  content.style.padding = '12px';
 
   const badge = document.createElement('span');
   badge.style.cssText = `
@@ -212,6 +201,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
         wrapper.style.background = 'transparent';
         wrapper.style.border = 'none';
         wrapper.style.padding = '0';
+        wrapper.style.width = 'max-content';
       }
     },
   };
