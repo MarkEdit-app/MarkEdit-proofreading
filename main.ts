@@ -1,7 +1,4 @@
-import { lint } from './src/lint';
+import { MarkEdit } from 'markedit-api';
+import { proofreadingExtension } from './src/extension';
 
-(async () => {
-  // For testing purpose only
-  const results = lint('Helllo, is this something you want?');
-  console.log(results);
-})();
+MarkEdit.addExtension(proofreadingExtension());
