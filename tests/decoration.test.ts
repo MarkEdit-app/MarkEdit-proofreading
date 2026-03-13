@@ -9,6 +9,18 @@ function makeSuggestion(kind: SuggestionKind, replacement: string) {
   };
 }
 
+type LintStub = {
+  span: () => { start: number; end: number };
+  lint_kind: () => string;
+  lint_kind_pretty: () => string;
+  message_html: () => string;
+  suggestions: () => ReturnType<typeof makeSuggestion>[];
+};
+
+type ViewStub = {
+  dispatch: (transaction: unknown) => void;
+};
+
 describe('lintToDiagnostic', () => {
   it('maps lint fields and creates action labels', () => {
     const lint = {
@@ -23,7 +35,7 @@ describe('lintToDiagnostic', () => {
       ],
     };
 
-    const diagnostic = lintToDiagnostic(lint as never);
+    const diagnostic = lintToDiagnostic(lint as unknown as LintStub);
 
     expect(diagnostic).toMatchObject({
       from: 1,
@@ -47,13 +59,13 @@ describe('lintToDiagnostic', () => {
         makeSuggestion(SuggestionKind.InsertAfter, '!'),
       ],
     };
-    const diagnostic = lintToDiagnostic(lint as never);
+    const diagnostic = lintToDiagnostic(lint as unknown as LintStub);
     const dispatch = vi.fn();
     const view = { dispatch };
 
-    diagnostic.actions[0].apply(view as never, 2, 6);
-    diagnostic.actions[1].apply(view as never, 2, 6);
-    diagnostic.actions[2].apply(view as never, 2, 6);
+    diagnostic.actions[0].apply(view as unknown as ViewStub, 2, 6);
+    diagnostic.actions[1].apply(view as unknown as ViewStub, 2, 6);
+    diagnostic.actions[2].apply(view as unknown as ViewStub, 2, 6);
 
     expect(dispatch).toHaveBeenNthCalledWith(1, {
       changes: { from: 2, to: 6, insert: '' },
