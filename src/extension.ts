@@ -11,7 +11,7 @@ interface Diagnostic {
   from: number;
   to: number;
   title: string;
-  messageHtml: string;
+  message: string;
   actions: DiagnosticAction[];
 }
 
@@ -38,7 +38,7 @@ const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; decorati
         const diagnostics = effect.value;
         const ranges = diagnostics
           .filter(d => d.from < d.to)
-          .map(d => Decoration.mark({ class: 'cm-harper-lint', diagnostic: d }).range(d.from, d.to));
+          .map(d => Decoration.mark({ class: 'cm-harper-lint' }).range(d.from, d.to));
 
         value = { diagnostics, decorations: Decoration.set(ranges, true) };
       }
@@ -97,7 +97,7 @@ function lintToDiagnostic(l: Lint): Diagnostic {
     from: span.start,
     to: span.end,
     title: l.lint_kind_pretty(),
-    messageHtml: l.message_html(),
+    message: l.message(),
     actions: l.suggestions().map(suggestionToAction),
   };
 }
@@ -161,7 +161,7 @@ const lintTooltip = hoverTooltip((view, pos, side) => {
 
         const message = document.createElement('div');
         message.className = 'cm-harper-message';
-        message.innerHTML = diagnostic.messageHtml;
+        message.textContent = diagnostic.message;
         item.appendChild(message);
 
         if (diagnostic.actions.length > 0) {
