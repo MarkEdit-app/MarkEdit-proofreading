@@ -89,13 +89,13 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   const isDark = view.state.facet(EditorView.darkTheme);
   const color = colorForKind(diagnostic.lintKind);
 
-  // Outer card — visual styles only, no padding (CM6 may strip padding from this element)
   const dom = document.createElement('div');
   dom.style.cssText = `
     border-radius: 10px;
     overflow: hidden;
     max-width: 360px;
     min-width: 180px;
+    margin: 0 6px 6px 6px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
     user-select: none;
     -webkit-user-select: none;
@@ -103,13 +103,12 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     background: ${isDark ? 'rgba(40, 40, 40, 0.82)' : 'rgba(255, 255, 255, 0.85)'};
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    border: 1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
+    border: 0.5px solid ${isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.15)'};
     box-shadow: ${isDark
       ? '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)'
       : '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)'};
   `;
 
-  // Inner content wrapper — padding lives here, safe from CM6 interference
   const content = document.createElement('div');
   content.style.padding = '12px 14px';
 
@@ -144,20 +143,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
     for (const action of diagnostic.actions) {
       const btn = document.createElement('button');
-      const bg = isDark ? '#2d333b' : '#f6f8fa';
-      const bc = isDark ? '#444c56' : '#d0d7de';
-      btn.style.cssText = `
-        padding: 4px 12px;
-        border: 1px solid ${bc};
-        border-radius: 6px;
-        background: ${bg};
-        color: ${isDark ? '#adbac7' : '#24292f'};
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
-        font-family: inherit;
-        line-height: 1.4;
-      `;
+      btn.style.cssText = buttonStyle(isDark);
       btn.textContent = action.name;
       btn.onmousedown = (e) => {
         e.preventDefault();
@@ -169,12 +155,11 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
         }
       };
       btn.onmouseenter = () => {
-        btn.style.background = isDark ? '#373e47' : '#eaeef2';
-        btn.style.borderColor = isDark ? '#545d68' : '#afb8c1';
+        btn.style.background = isDark ? '#404850' : '#eaeef2';
+        btn.style.borderColor = isDark ? '#5a6570' : '#afb8c1';
       };
       btn.onmouseleave = () => {
-        btn.style.background = bg;
-        btn.style.borderColor = bc;
+        btn.style.cssText = buttonStyle(isDark);
       };
       actions.appendChild(btn);
     }
@@ -195,4 +180,19 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       }
     },
   };
+}
+
+function buttonStyle(isDark: boolean): string {
+  return `
+    padding: 4px 12px;
+    border: 1px solid ${isDark ? '#505860' : '#d0d7de'};
+    border-radius: 6px;
+    background: ${isDark ? '#343a44' : '#f6f8fa'};
+    color: ${isDark ? '#c9d1d9' : '#24292f'};
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 1.4;
+  `;
 }
