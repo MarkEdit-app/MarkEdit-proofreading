@@ -80,7 +80,7 @@ const cardCSS = `
     overflow: hidden;
     max-width: 360px;
     min-width: 180px;
-    margin: 0 6px 6px 6px;
+    margin: 8px 0 0 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
     user-select: none;
     -webkit-user-select: none;
@@ -107,6 +107,9 @@ const cardCSS = `
   .harper-card .harper-btn:hover {
     background: #eaeef2;
     border-color: #afb8c1;
+  }
+  .cm-tooltip-above .harper-card {
+    margin: 0 0 8px 0;
   }
   @media (prefers-color-scheme: dark) {
     .harper-card {
