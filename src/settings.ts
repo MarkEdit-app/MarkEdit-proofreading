@@ -3,23 +3,26 @@ import type { MarkEdit } from 'markedit-api';
 
 const settingsKey = 'extension.markeditProofreading';
 
-export const conservativeDisabledLintKinds = ['Enhancement', 'Readability', 'Repetition', 'Style', 'WordChoice'] as const;
+export type LintPreset = 'strict' | 'standard' | 'relaxed';
 
-type LintProfile = 'all' | 'conservative';
+const presetDisabledKinds: Record<LintPreset, readonly string[]> = {
+  strict: [],
+  standard: ['Enhancement', 'Style', 'WordChoice'],
+  relaxed: ['Enhancement', 'Readability', 'Redundancy', 'Repetition', 'Style', 'WordChoice'],
+};
+
 type JSONObject = MarkEdit['userSettings'];
 type JSONValue = JSONObject[string];
 
 export interface ProofreadingSettings {
-  lintProfile: LintProfile;
+  lintPreset: LintPreset;
   lintRules: LintConfig;
-  disabledLintKinds: string[];
 }
 
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
   const defaults: ProofreadingSettings = {
-    lintProfile: 'conservative',
+    lintPreset: 'standard',
     lintRules: {},
-    disabledLintKinds: [],
   };
 
   const root = asObject(userSettings);
@@ -28,22 +31,25 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
     return defaults;
   }
 
-  const lintProfile: LintProfile = raw.lintProfile === 'all' ? 'all' : 'conservative';
+  const lintPreset = parseLintPreset(raw.lintPreset);
 
   const lintRules = Object.fromEntries(
     Object.entries(asObject(raw.lintRules) ?? {}).filter(([, value]) => isLintRuleValue(value)),
   ) as LintConfig;
 
-  const disabledLintKinds = Array.isArray(raw.disabledLintKinds)
-    ? raw.disabledLintKinds.filter((kind): kind is string => typeof kind === 'string' && kind.length > 0)
-    : [];
-
-  return { lintProfile, lintRules, disabledLintKinds };
+  return { lintPreset, lintRules };
 }
 
-export function disabledLintKindsFor(settings: ProofreadingSettings): Set<string> {
-  const disabled = settings.lintProfile === 'all' ? [] : conservativeDisabledLintKinds;
-  return new Set([...disabled, ...settings.disabledLintKinds]);
+export function disabledLintKindsFor(preset: LintPreset): Set<string> {
+  return new Set(presetDisabledKinds[preset]);
+}
+
+function parseLintPreset(value: JSONValue): LintPreset {
+  if (value === 'strict' || value === 'relaxed') {
+    return value;
+  }
+
+  return 'standard';
 }
 
 function asObject(value: JSONValue | undefined): JSONObject | undefined {

@@ -4,23 +4,18 @@
 
 ## Configuration
 
-By default, this extension uses a conservative lint profile and hides these higher-sensitivity Harper categories:
+This extension provides three presets to control how aggressively Harper checks your writing:
 
-- `Enhancement`
-- `Readability`
-- `Repetition`
-- `Style`
-- `WordChoice`
+- `"strict"`: All Harper rules are active
+- `"standard"` (default): Hides Enhancement, Style, and WordChoice categories
+- `"relaxed"`: Also hides Readability, Redundancy, and Repetition categories
 
-This is a balanced default for general writing: it keeps grammar/spelling checks while reducing noisy style/readability suggestions. If you prefer maximum strictness, switch to `lintProfile: "all"`.
-
-You can customize behavior from `settings.json` with the `extension.markeditProofreading` section (see MarkEdit advanced settings: https://github.com/MarkEdit-app/MarkEdit/wiki/Customization#advanced-settings):
+You can customize behavior from `settings.json` with the `extension.markeditProofreading` section (see [MarkEdit advanced settings](https://github.com/MarkEdit-app/MarkEdit/wiki/Customization#advanced-settings)):
 
 ```json
 {
   "extension.markeditProofreading": {
-    "lintProfile": "all",
-    "disabledLintKinds": ["Regionalism"],
+    "lintPreset": "relaxed",
     "lintRules": {
       "SpelledNumbers": false,
       "NoOxfordComma": true
@@ -29,9 +24,8 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 }
 ```
 
-- `lintProfile`: `"conservative"` (default) or `"all"`
-- `disabledLintKinds`: additional lint kinds to hide
-- `lintRules`: Harper rule overrides (`true` / `false` / `null`), same shape as `Linter.setLintConfig`
+- `lintPreset`: `"strict"`, `"standard"` (default), or `"relaxed"`
+- `lintRules`: per-rule overrides (`true` / `false` / `null`) applied on top of the preset
 
-For a user-facing guide to Harper rules, see:
+For a full list of available rule names, see:
 https://writewithharper.com/docs/rules

@@ -4,7 +4,7 @@ import { disabledLintKindsFor, getProofreadingSettings } from './settings';
 
 const linter = new LocalLinter({ binary: binaryInlined });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
-const disabledLintKinds = disabledLintKindsFor(settings);
+const disabledLintKinds = disabledLintKindsFor(settings.lintPreset);
 const configureLinterPromise = applyLintRules().catch(error => {
   console.warn('[markedit-proofreading] Failed to apply lintRules from settings.json (extension.markeditProofreading.lintRules).', error);
 });
@@ -15,6 +15,7 @@ export async function lint(text: string) {
   if (disabledLintKinds.size === 0) {
     return lints;
   }
+
   return lints.filter(l => !disabledLintKinds.has(l.lint_kind()));
 }
 

@@ -1,37 +1,52 @@
 import { describe, expect, it } from 'vitest';
-import { conservativeDisabledLintKinds, disabledLintKindsFor, getProofreadingSettings } from '../src/settings';
+import { disabledLintKindsFor, getProofreadingSettings } from '../src/settings';
 
-describe('proofreading options', () => {
-  it('uses conservative defaults when no settings are provided', () => {
+describe('proofreading settings', () => {
+  it('uses standard defaults when no settings are provided', () => {
     const settings = getProofreadingSettings(undefined);
-    const disabledKinds = disabledLintKindsFor(settings);
+    const disabledKinds = disabledLintKindsFor(settings.lintPreset);
 
-    expect(settings.lintProfile).toBe('conservative');
+    expect(settings.lintPreset).toBe('standard');
     expect(settings.lintRules).toEqual({});
-    expect([...disabledKinds]).toEqual([...conservativeDisabledLintKinds]);
+    expect([...disabledKinds]).toEqual(['Enhancement', 'Style', 'WordChoice']);
   });
 
-  it('parses lint profile, per-rule overrides, and disabled kinds from user settings', () => {
+  it('parses lint preset, per-rule overrides from user settings', () => {
     const settings = getProofreadingSettings({
       'extension.markeditProofreading': {
-        lintProfile: 'all',
+        lintPreset: 'strict',
         lintRules: {
           SpelledNumbers: true,
           NoOxfordComma: false,
           Keep: null,
           InvalidStringValue: 'yes',
         },
-        disabledLintKinds: ['Usage', 'Grammar', 123],
       },
     });
-    const disabledKinds = disabledLintKindsFor(settings);
+    const disabledKinds = disabledLintKindsFor(settings.lintPreset);
 
-    expect(settings.lintProfile).toBe('all');
+    expect(settings.lintPreset).toBe('strict');
     expect(settings.lintRules).toEqual({
       SpelledNumbers: true,
       NoOxfordComma: false,
       Keep: null,
     });
-    expect([...disabledKinds]).toEqual(['Usage', 'Grammar']);
+    expect([...disabledKinds]).toEqual([]);
+  });
+
+  it('provides three severity presets', () => {
+    expect([...disabledLintKindsFor('strict')]).toEqual([]);
+    expect([...disabledLintKindsFor('standard')]).toEqual(['Enhancement', 'Style', 'WordChoice']);
+    expect([...disabledLintKindsFor('relaxed')]).toEqual(['Enhancement', 'Readability', 'Redundancy', 'Repetition', 'Style', 'WordChoice']);
+  });
+
+  it('falls back to standard for unrecognized preset values', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        lintPreset: 'unknown',
+      },
+    });
+
+    expect(settings.lintPreset).toBe('standard');
   });
 });
