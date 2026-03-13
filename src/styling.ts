@@ -50,16 +50,21 @@ export const baseTheme = EditorView.baseTheme({
   // Tooltip card container (class added via mount callback)
   '.cm-harper-card.cm-tooltip': {
     borderRadius: '10px',
-    border: '1px solid #e0e0e0',
-    background: '#ffffff',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08)',
+    border: '1px solid rgba(0, 0, 0, 0.1)',
+    background: 'rgba(255, 255, 255, 0.85)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)',
     padding: '0',
     overflow: 'hidden',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    WebkitTouchCallout: 'none',
   },
   '&dark .cm-harper-card.cm-tooltip': {
-    border: '1px solid #3d3d3d',
-    background: '#252525',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: 'rgba(40, 40, 40, 0.82)',
+    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2)',
   },
   // Tooltip content
   '.cm-harper-tooltip': {

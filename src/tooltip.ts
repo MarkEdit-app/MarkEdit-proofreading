@@ -35,6 +35,23 @@ export const clickTooltipField = StateField.define<Tooltip | null>({
 });
 
 export const tooltipHandlers = EditorView.domEventHandlers({
+  mousedown(event, view) {
+    const target = event.target as HTMLElement;
+    if (target.closest('.cm-tooltip')) return false;
+
+    const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
+    if (pos === null) return false;
+
+    const { diagnostics } = view.state.field(diagnosticsField);
+    const found = diagnostics.find(d => pos >= d.from && pos <= d.to);
+
+    if (found) {
+      event.preventDefault();
+      return true;
+    }
+
+    return false;
+  },
   mouseup(event, view) {
     const target = event.target as HTMLElement;
     if (target.closest('.cm-tooltip')) return false;
@@ -52,6 +69,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
 
     if (found) {
       view.dispatch({ effects: setClickTooltip.of(found) });
+      return true;
     } else if (view.state.field(clickTooltipField) !== null) {
       view.dispatch({ effects: setClickTooltip.of(null) });
     }
