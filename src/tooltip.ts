@@ -141,10 +141,10 @@ const cardCSS = `
   }
   .harper-card .harper-ignore {
     padding: 2px 6px;
-    border: 1px solid #d0d7de;
+    border: 1px solid #c0c0c0;
     border-radius: 6px;
-    background: #f6f8fa;
-    color: #656d76;
+    background: transparent;
+    color: #888;
     cursor: pointer;
     font-size: 12px;
     font-weight: 400;
@@ -152,7 +152,7 @@ const cardCSS = `
     line-height: 1.4;
     margin-left: auto;
   }
-  .harper-card .harper-ignore:hover { background: #eaeef2; border-color: #afb8c1; color: #24292f; }
+  .harper-card .harper-ignore:hover { background: rgba(0, 0, 0, 0.05); border-color: #999; color: #555; }
   @media (prefers-color-scheme: dark) {
     .harper-card {
       background: rgba(40, 40, 40, 0.4);
@@ -177,10 +177,10 @@ const cardCSS = `
     }
     .harper-card .harper-ignore {
       border-color: #555;
-      background: #3d3d3d;
-      color: #999;
+      background: transparent;
+      color: #888;
     }
-    .harper-card .harper-ignore:hover { background: #4a4a4a; border-color: #666; color: #e0e0e0; }
+    .harper-card .harper-ignore:hover { background: rgba(255, 255, 255, 0.08); border-color: #666; color: #bbb; }
   }
 `;
 

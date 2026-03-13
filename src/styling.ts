@@ -54,20 +54,29 @@ const fallbackDark = '#9CA3AF';
 export function kindCSS(): string {
   let css = '';
 
-  css += `.cm-harper-lint { text-decoration: underline solid ${fallback} 2px; background-color: ${fallback}22; }\n`;
+  // Default: lighter underline, subtle bg
+  css += `.cm-harper-lint { text-decoration: underline solid ${fallback}aa 2px; background-color: ${fallback}11; }\n`;
+  css += `.cm-harper-lint:hover { text-decoration-color: ${fallback}; background-color: ${fallback}22; }\n`;
+  css += `.cm-harper-lint:active { background-color: ${fallback}33; }\n`;
   css += `.harper-badge { color: ${fallback}; background-color: ${fallback}22; }\n`;
 
   for (const [kind, color] of Object.entries(kindColors)) {
-    css += `.cm-harper-lint[data-lint-kind="${kind}"] { text-decoration: underline solid ${color} 2px; background-color: ${color}22; }\n`;
+    css += `.cm-harper-lint[data-lint-kind="${kind}"] { text-decoration: underline solid ${color}aa 2px; background-color: ${color}11; }\n`;
+    css += `.cm-harper-lint[data-lint-kind="${kind}"]:hover { text-decoration-color: ${color}; background-color: ${color}22; }\n`;
+    css += `.cm-harper-lint[data-lint-kind="${kind}"]:active { background-color: ${color}33; }\n`;
     css += `.harper-badge[data-kind="${kind}"] { color: ${color}; background-color: ${color}22; }\n`;
   }
 
   css += '@media (prefers-color-scheme: dark) {\n';
-  css += `  .cm-harper-lint { text-decoration: underline solid ${fallbackDark} 2px; background-color: ${fallbackDark}22; }\n`;
+  css += `  .cm-harper-lint { text-decoration: underline solid ${fallbackDark}aa 2px; background-color: ${fallbackDark}11; }\n`;
+  css += `  .cm-harper-lint:hover { text-decoration-color: ${fallbackDark}; background-color: ${fallbackDark}22; }\n`;
+  css += `  .cm-harper-lint:active { background-color: ${fallbackDark}33; }\n`;
   css += `  .harper-badge { color: ${fallbackDark}; background-color: ${fallbackDark}22; }\n`;
   for (const kind of Object.keys(kindColors)) {
     const dark = kindColorsDark[kind] ?? kindColors[kind];
-    css += `  .cm-harper-lint[data-lint-kind="${kind}"] { text-decoration: underline solid ${dark} 2px; background-color: ${dark}22; }\n`;
+    css += `  .cm-harper-lint[data-lint-kind="${kind}"] { text-decoration: underline solid ${dark}aa 2px; background-color: ${dark}11; }\n`;
+    css += `  .cm-harper-lint[data-lint-kind="${kind}"]:hover { text-decoration-color: ${dark}; background-color: ${dark}22; }\n`;
+    css += `  .cm-harper-lint[data-lint-kind="${kind}"]:active { background-color: ${dark}33; }\n`;
     css += `  .harper-badge[data-kind="${kind}"] { color: ${dark}; background-color: ${dark}22; }\n`;
   }
   css += '}\n';
@@ -80,5 +89,6 @@ export const baseTheme = EditorView.baseTheme({
     cursor: 'default',
     borderRadius: '2px',
     textUnderlineOffset: '3px',
+    transition: 'text-decoration-color 0.15s, background-color 0.15s',
   },
 });
