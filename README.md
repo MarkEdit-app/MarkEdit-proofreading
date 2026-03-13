@@ -33,7 +33,5 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 - `disabledLintKinds`: additional lint kinds to hide
 - `lintRules`: Harper rule overrides (`true` / `false` / `null`), same shape as `Linter.setLintConfig`
 
-References:
-
-- MarkEdit settings/customization: https://github.com/MarkEdit-app/MarkEdit/wiki/Customization#advanced-settings
-- Harper.js API reference: https://writewithharper.com/docs/harperjs/ref/harper.js.html
+Rule names in `lintRules` come from Harper’s official documentation:
+https://writewithharper.com/docs/harperjs/ref/harper.js.html
