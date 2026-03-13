@@ -179,8 +179,8 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       const btn = document.createElement('button');
       btn.className = 'harper-btn';
       btn.textContent = action.name;
-      btn.onmousedown = (e) => {
-        e.preventDefault();
+      btn.onmousedown = (e) => e.preventDefault();
+      btn.onclick = () => {
         const current = view.state.field(diagnosticsField).diagnostics.find(d =>
           d.from === diagnostic.from && d.to === diagnostic.to,
         );
