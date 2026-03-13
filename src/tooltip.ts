@@ -91,12 +91,12 @@ const cardCSS = `
   }
   .harper-card .harper-close {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 4px;
+    right: 6px;
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 20px;
     line-height: 1;
     color: #888;
     padding: 4px;
@@ -105,6 +105,9 @@ const cardCSS = `
   }
   .harper-card .harper-close:hover { color: #444; }
   .harper-card .harper-msg { color: #444444; }
+  .harper-card .harper-msg p {
+    margin: 0px;
+  }
   .harper-card .harper-msg code {
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
     font-size: 12px;
@@ -113,7 +116,7 @@ const cardCSS = `
     background: rgba(0, 0, 0, 0.06);
   }
   .harper-card .harper-btn {
-    padding: 3px 6px;
+    padding: 2px 8px;
     border: 1px solid #d0d7de;
     border-radius: 6px;
     background: #f6f8fa;
@@ -129,14 +132,14 @@ const cardCSS = `
     border-color: #afb8c1;
   }
   .harper-card .harper-ignore {
-    padding: 3px 6px;
-    border: 1px solid #d0d7de;
+    padding: 2px 8px;
+    border: 0.5px solid #d0d7de;
     border-radius: 6px;
     background: #f6f8fa;
     color: #656d76;
     cursor: pointer;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 400;
     font-family: inherit;
     line-height: 1.4;
     margin-left: auto;
@@ -186,6 +189,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   const close = document.createElement('button');
   close.className = 'harper-close';
   close.textContent = '✕';
+  close.ariaLabel = 'Close';
   close.onmousedown = (e) => e.preventDefault();
   close.onclick = () => {
     view.dispatch({ effects: setClickTooltip.of(null) });
@@ -193,7 +197,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   dom.appendChild(close);
 
   const content = document.createElement('div');
-  content.style.padding = '15px';
+  content.style.padding = '12px';
 
   // Header: badge only
   const badge = document.createElement('span');
@@ -201,7 +205,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   badge.setAttribute('data-kind', diagnostic.lintKind);
   badge.style.cssText = `
     display: inline-block;
-    padding: 2px 8px;
+    padding: 2px 4px;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 600;
@@ -216,7 +220,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   msg.style.cssText = `
     font-size: 13px;
     line-height: 1.5;
-    margin: 8px 0 10px;
+    margin: 8px 0 20px;
   `;
   msg.innerHTML = diagnostic.messageHtml;
   content.appendChild(msg);
