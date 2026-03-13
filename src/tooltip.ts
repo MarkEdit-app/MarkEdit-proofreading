@@ -1,6 +1,6 @@
 import { StateField, StateEffect } from '@codemirror/state';
 import { showTooltip, EditorView } from '@codemirror/view';
-import type { Tooltip } from '@codemirror/view';
+import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
 import { colorForKind } from './styling';
@@ -80,7 +80,6 @@ const cardCSS = `
     overflow: hidden;
     max-width: 360px;
     min-width: 180px;
-    margin: 8px 6px 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
     user-select: none;
     -webkit-user-select: none;
@@ -107,9 +106,6 @@ const cardCSS = `
   .harper-card .harper-btn:hover {
     background: #eaeef2;
     border-color: #afb8c1;
-  }
-  .cm-tooltip-above .harper-card {
-    margin: 0 6px 8px !important;
   }
   @media (prefers-color-scheme: dark) {
     .harper-card {
@@ -198,6 +194,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
   return {
     dom,
+    offset: { x: -6, y: 8 },
     mount() {
       const wrapper = dom.closest('.cm-tooltip') as HTMLElement | null;
       if (wrapper) {
@@ -207,5 +204,5 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
         wrapper.style.width = 'max-content';
       }
     },
-  };
+  } as TooltipView;
 }
