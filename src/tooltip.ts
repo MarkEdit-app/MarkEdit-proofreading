@@ -84,7 +84,7 @@ const cardCSS = `
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.4);
     border: 1px solid rgba(0, 0, 0, 0.2) !important;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
   }
@@ -92,8 +92,10 @@ const cardCSS = `
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.7);
     pointer-events: none;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
   .harper-card .harper-close {
     position: absolute;
@@ -153,11 +155,12 @@ const cardCSS = `
   .harper-card .harper-ignore:hover { background: #eaeef2; border-color: #afb8c1; color: #24292f; }
   @media (prefers-color-scheme: dark) {
     .harper-card {
+      background: rgba(40, 40, 40, 0.4);
       border-color: rgba(255, 255, 255, 0.2) !important;
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 4px rgba(0, 0, 0, 0.2);
     }
     .harper-card .harper-bg {
-      background: rgba(40, 40, 40, 0.88);
+      background: rgba(40, 40, 40, 0.7);
     }
     .harper-card .harper-close { color: #777; }
     .harper-card .harper-close:hover { color: #bbb; }
