@@ -1,11 +1,11 @@
-import { LocalLinter, binaryInlined, type LintConfig } from 'harper.js';
+import { LocalLinter, binary, type LintConfig } from 'harper.js';
 import { MarkEdit } from 'markedit-api';
 import { getProofreadingSettings } from './settings';
 import { presetDisabledRules } from './rules';
 import { presetDisabledKinds } from './kinds';
 import { loadWords, saveWords } from './dict';
 
-const linter = new LocalLinter({ binary: binaryInlined });
+const linter = new LocalLinter({ binary });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
 const disabledKinds = resolveDisabledKinds();
 const linterReady = configureLinter().catch(error => {
