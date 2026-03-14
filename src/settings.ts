@@ -5,7 +5,7 @@ const settingsKey = 'extension.markeditProofreading';
 
 export type LintPreset = 'strict' | 'standard' | 'relaxed';
 
-const presetDisabledKinds: Record<LintPreset, readonly string[]> = {
+export const presetDisabledKinds: Record<LintPreset, readonly string[]> = {
   strict: [],
   standard: ['Enhancement', 'Style', 'WordChoice'],
   relaxed: ['Enhancement', 'Readability', 'Redundancy', 'Repetition', 'Style', 'WordChoice'],
@@ -38,10 +38,6 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
   ) as LintConfig;
 
   return { lintPreset, lintRules };
-}
-
-export function disabledLintKindsFor(preset: LintPreset): Set<string> {
-  return new Set(presetDisabledKinds[preset]);
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {

@@ -4,11 +4,11 @@
 
 ## Configuration
 
-This extension provides three presets to control how aggressively Harper checks your writing:
+This extension provides three presets to control how aggressively Harper checks your writing. Presets work by disabling specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules):
 
 - `"strict"`: All Harper rules are active
-- `"standard"` (default): Hides Enhancement, Style, and WordChoice categories
-- `"relaxed"`: Also hides Readability, Redundancy, and Repetition categories
+- `"standard"` (default): Disables Enhancement, Style, and WordChoice rules
+- `"relaxed"`: Also disables Readability, Redundancy, and Repetition rules
 
 You can customize behavior from `settings.json` with the `extension.markeditProofreading` section (see [MarkEdit advanced settings](https://github.com/MarkEdit-app/MarkEdit/wiki/Customization#advanced-settings)):
 

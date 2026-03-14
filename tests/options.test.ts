@@ -1,14 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { disabledLintKindsFor, getProofreadingSettings } from '../src/settings';
+import { getProofreadingSettings, presetDisabledKinds } from '../src/settings';
 
 describe('proofreading settings', () => {
   it('uses standard defaults when no settings are provided', () => {
     const settings = getProofreadingSettings(undefined);
-    const disabledKinds = disabledLintKindsFor(settings.lintPreset);
 
     expect(settings.lintPreset).toBe('standard');
     expect(settings.lintRules).toEqual({});
-    expect([...disabledKinds]).toEqual(['Enhancement', 'Style', 'WordChoice']);
   });
 
   it('parses lint preset, per-rule overrides from user settings', () => {
@@ -23,7 +21,6 @@ describe('proofreading settings', () => {
         },
       },
     });
-    const disabledKinds = disabledLintKindsFor(settings.lintPreset);
 
     expect(settings.lintPreset).toBe('strict');
     expect(settings.lintRules).toEqual({
@@ -31,13 +28,12 @@ describe('proofreading settings', () => {
       NoOxfordComma: false,
       Keep: null,
     });
-    expect([...disabledKinds]).toEqual([]);
   });
 
-  it('provides three severity presets', () => {
-    expect([...disabledLintKindsFor('strict')]).toEqual([]);
-    expect([...disabledLintKindsFor('standard')]).toEqual(['Enhancement', 'Style', 'WordChoice']);
-    expect([...disabledLintKindsFor('relaxed')]).toEqual(['Enhancement', 'Readability', 'Redundancy', 'Repetition', 'Style', 'WordChoice']);
+  it('defines disabled lint kinds for three presets', () => {
+    expect(presetDisabledKinds.strict).toEqual([]);
+    expect(presetDisabledKinds.standard).toEqual(['Enhancement', 'Style', 'WordChoice']);
+    expect(presetDisabledKinds.relaxed).toEqual(['Enhancement', 'Readability', 'Redundancy', 'Repetition', 'Style', 'WordChoice']);
   });
 
   it('falls back to standard for unrecognized preset values', () => {
