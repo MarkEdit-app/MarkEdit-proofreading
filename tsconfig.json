@@ -9,6 +9,8 @@
     "strictNullChecks": true,
     "importHelpers": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
   }
 }
