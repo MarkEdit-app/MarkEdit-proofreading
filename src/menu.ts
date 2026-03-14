@@ -19,7 +19,10 @@ export function buildMenuItem(): MenuItem {
       },
       {
         title: 'Reset Dictionary',
-        action: resetAndProofread,
+        action: async() => {
+          await resetDictionary();
+          await proofreadNow();
+        },
       },
       { separator: true },
       {
@@ -43,9 +46,4 @@ async function proofreadNow() {
 
 function ignoreAll() {
   MarkEdit.editorView.dispatch({ effects: setDiagnosticsEffect.of([]) });
-}
-
-async function resetAndProofread() {
-  await resetDictionary();
-  await proofreadNow();
 }
