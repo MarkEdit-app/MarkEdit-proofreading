@@ -1,7 +1,7 @@
 import { MarkEdit } from 'markedit-api';
 import type { MenuItem } from 'markedit-api';
 import { setDiagnosticsEffect, lintToDiagnostic } from './decoration';
-import { lint } from './lint';
+import { lint, resetDictionary } from './lint';
 import { repoUrl } from './const';
 
 export function buildMenuItem(): MenuItem {
@@ -16,6 +16,10 @@ export function buildMenuItem(): MenuItem {
       {
         title: 'Ignore All',
         action: ignoreAll,
+      },
+      {
+        title: 'Reset Dictionary',
+        action: () => resetDictionary(),
       },
       { separator: true },
       {

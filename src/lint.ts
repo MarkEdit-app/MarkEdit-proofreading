@@ -26,6 +26,12 @@ export async function lint(text: string) {
   return lints.filter(lint => !disabledKinds.has(lint.lint_kind()));
 }
 
+export async function resetDictionary(): Promise<void> {
+  await linterReady;
+  await linter.clearWords();
+  await saveWords([]);
+}
+
 export async function addToDictionary(word: string): Promise<void> {
   await linterReady;
   await linter.importWords([word]);
