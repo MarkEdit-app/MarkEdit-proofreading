@@ -15,6 +15,7 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 ```json
 {
   "extension.markeditProofreading": {
+    "autoLintDelay": 1000,
     "lintPreset": "relaxed",
     "lintRuleOverrides": {
       "SpelledNumbers": false,
@@ -25,9 +26,10 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 }
 ```
 
+- `autoLintDelay`: Delay in milliseconds before automatic proofreading runs after a document change (default: `1000`). Set to `-1` to disable automatic proofreading entirely (use "Proofread Now" to lint on demand)
 - `lintPreset`: `"strict"`, `"standard"` (default), or `"relaxed"`
-- `lintRuleOverrides`: per-rule overrides (`true` / `false` / `null`) applied on top of the preset
-- `disabledLintKinds`: additional lint kinds to filter out, available kinds:
+- `lintRuleOverrides`: Per-rule overrides (`true` / `false` / `null`) applied on top of the preset
+- `disabledLintKinds`: Additional lint kinds to filter out, available kinds:
   - `Agreement`, `BoundaryError`, `Capitalization`, `Eggcorn`, `Enhancement`
   - `Formatting`, `Grammar`, `Malapropism`, `Miscellaneous`, `Nonstandard`
   - `Punctuation`, `Readability`, `Redundancy`, `Regionalism`, `Repetition`

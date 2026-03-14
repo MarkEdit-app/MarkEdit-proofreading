@@ -7,6 +7,7 @@ describe('proofreading settings', () => {
   it('uses standard defaults when no settings are provided', () => {
     const settings = getProofreadingSettings(undefined);
 
+    expect(settings.autoLintDelay).toBe(1000);
     expect(settings.lintPreset).toBe('standard');
     expect(settings.lintRuleOverrides).toEqual({});
     expect(settings.disabledLintKinds).toEqual([]);
@@ -83,5 +84,39 @@ describe('proofreading settings', () => {
     });
 
     expect(settings.lintPreset).toBe('standard');
+  });
+
+  it('parses autoLintDelay from user settings', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        autoLintDelay: 2000,
+      },
+    });
+
+    expect(settings.autoLintDelay).toBe(2000);
+  });
+
+  it('accepts -1 as autoLintDelay to disable automatic proofreading', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        autoLintDelay: -1,
+      },
+    });
+
+    expect(settings.autoLintDelay).toBe(-1);
+  });
+
+  it('falls back to 1000 for invalid autoLintDelay values', () => {
+    expect(getProofreadingSettings({
+      'extension.markeditProofreading': { autoLintDelay: 0 },
+    }).autoLintDelay).toBe(1000);
+
+    expect(getProofreadingSettings({
+      'extension.markeditProofreading': { autoLintDelay: -2 },
+    }).autoLintDelay).toBe(1000);
+
+    expect(getProofreadingSettings({
+      'extension.markeditProofreading': { autoLintDelay: 'fast' },
+    }).autoLintDelay).toBe(1000);
   });
 });
