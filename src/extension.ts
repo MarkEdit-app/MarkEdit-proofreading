@@ -21,6 +21,17 @@ const kindStyleInjector = ViewPlugin.define(() => {
   return {};
 });
 
+export function disableNativeSpellcheck(editorDom: Pick<HTMLElement, 'getAttribute' | 'setAttribute'>) {
+  if (editorDom.getAttribute('spellcheck') !== 'false') {
+    editorDom.setAttribute('spellcheck', 'false');
+  }
+}
+
+const nativeSpellcheckDisabler = ViewPlugin.define((view: EditorView) => {
+  disableNativeSpellcheck(view.dom);
+  return {};
+});
+
 const lintScheduler = ViewPlugin.fromClass(class {
   private timeout: ReturnType<typeof setTimeout> | undefined;
 
@@ -57,7 +68,7 @@ const lintScheduler = ViewPlugin.fromClass(class {
 });
 
 export function proofreadingExtension(): Extension {
-  const extensions: Extension[] = [diagnosticsField, clickTooltipField, tooltipHandlers, baseTheme, kindStyleInjector];
+  const extensions: Extension[] = [diagnosticsField, clickTooltipField, tooltipHandlers, baseTheme, kindStyleInjector, nativeSpellcheckDisabler];
 
   if (autoLintDelay !== -1) {
     extensions.push(lintScheduler);
