@@ -49,10 +49,11 @@ function resolveDisabledKinds(): ReadonlySet<string> {
 
 async function configureLinter() {
   const disabledRules = presetDisabledRules(settings.lintPreset);
+  const hasRuleConfig =
+    disabledRules.length > 0 ||
+    Object.keys(settings.lintRuleOverrides).length > 0;
 
-  if (disabledRules.length === 0 && Object.keys(settings.lintRuleOverrides).length === 0) {
-    // Still need to load dictionary even if no rules to configure
-  } else {
+  if (hasRuleConfig) {
     const config: LintConfig = await linter.getDefaultLintConfig();
 
     for (const rule of disabledRules) {
@@ -69,7 +70,7 @@ async function configureLinter() {
     await linter.setLintConfig(config);
   }
 
-  // Load persisted dictionary words
+  // Load persisted dictionary words (always, even if no rules to configure)
   const words = await loadWords();
   if (words.length > 0) {
     await linter.importWords(words);
