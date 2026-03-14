@@ -1,9 +1,9 @@
 import { MarkEdit } from 'markedit-api';
 
-const dictionaryFileName = 'harper-dictionary.txt';
+const dictionaryFileName = 'proofreading-dict.txt';
 
 function dictionaryPath(): string {
-  return `${MarkEdit.getDirectoryPath('library')}/${dictionaryFileName}`;
+  return `${MarkEdit.getDirectoryPath('documents')}/${dictionaryFileName}`;
 }
 
 export async function loadWords(): Promise<string[]> {

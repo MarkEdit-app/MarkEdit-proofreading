@@ -13,6 +13,7 @@ export interface ProofreadingSettings {
   lintPreset: LintPreset;
   lintRuleOverrides: LintConfig;
   disabledLintKinds: string[];
+  addToDict: boolean;
 }
 
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
@@ -21,6 +22,7 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
     lintPreset: 'standard',
     lintRuleOverrides: {},
     disabledLintKinds: [],
+    addToDict: true,
   };
 
   const root = asObject(userSettings);
@@ -37,8 +39,9 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
   ) as LintConfig;
 
   const disabledLintKinds = parseStringArray(raw.disabledLintKinds);
+  const addToDict = raw.addToDict === false ? false : true;
 
-  return { autoLintDelay, lintPreset, lintRuleOverrides, disabledLintKinds };
+  return { autoLintDelay, lintPreset, lintRuleOverrides, disabledLintKinds, addToDict };
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {

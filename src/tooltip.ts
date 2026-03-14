@@ -2,7 +2,7 @@ import { StateField, StateEffect } from '@codemirror/state';
 import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
-import { addToDictionary } from './lint';
+import { addToDictionary, shouldAddToDict } from './lint';
 import type { Diagnostic } from './decoration';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
@@ -241,7 +241,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   msg.innerHTML = diagnostic.messageHtml;
   content.appendChild(msg);
 
-  // Actions: suggestion buttons + Add to Dictionary + Ignore
+  // Actions: suggestion buttons + Ignore
   const actions = document.createElement('div');
   actions.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; align-items: center;';
 
@@ -261,34 +261,14 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     actions.appendChild(btn);
   }
 
-  if (diagnostic.problemText) {
-    const dict = document.createElement('button');
-    dict.className = 'harper-ignore';
-    dict.textContent = 'Add to Dictionary';
-    dict.onmousedown = (e) => e.preventDefault();
-    dict.onclick = () => {
-      const word = diagnostic.problemText;
-      void addToDictionary(word);
-      const { diagnostics } = view.state.field(diagnosticsField);
-      const filtered = diagnostics.filter(d => d.problemText !== word);
-      view.dispatch({
-        effects: [
-          setClickTooltip.of(null),
-          setDiagnosticsEffect.of(filtered),
-        ],
-      });
-    };
-    actions.appendChild(dict);
-  }
-
   const ignore = document.createElement('button');
   ignore.className = 'harper-ignore';
-  if (diagnostic.problemText) {
-    ignore.style.marginLeft = '0';
-  }
   ignore.textContent = 'Ignore';
   ignore.onmousedown = (e) => e.preventDefault();
   ignore.onclick = () => {
+    if (shouldAddToDict && diagnostic.problemText) {
+      void addToDictionary(diagnostic.problemText);
+    }
     const { diagnostics } = view.state.field(diagnosticsField);
     const filtered = diagnostics.filter(d =>
       !(d.from === diagnostic.from && d.to === diagnostic.to && d.lintKind === diagnostic.lintKind),

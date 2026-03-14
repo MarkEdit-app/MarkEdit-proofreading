@@ -21,7 +21,8 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
       "SpelledNumbers": false,
       "NoOxfordComma": true
     },
-    "disabledLintKinds": ["Regionalism"]
+    "disabledLintKinds": ["Regionalism"],
+    "addToDict": true
   }
 }
 ```
@@ -34,12 +35,11 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
   - `Formatting`, `Grammar`, `Malapropism`, `Miscellaneous`, `Nonstandard`
   - `Punctuation`, `Readability`, `Redundancy`, `Regionalism`, `Repetition`
   - `Spelling`, `Style`, `Typo`, `Usage`, `WordChoice`
+- `addToDict`: When `true` (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary so it won't be flagged in future sessions. Set to `false` to disable this behavior
 
 For a full list of available rule names, see:
 https://writewithharper.com/docs/rules
 
-## Add to Dictionary
+## Dictionary
 
-When a word is flagged by the proofreader, clicking on it shows a tooltip with an **Add to Dictionary** button. This adds the word to a personal dictionary so it won't be flagged in future sessions.
-
-Dictionary words are persisted to `harper-dictionary.txt` in the MarkEdit library directory and automatically loaded when the extension starts.
+When `addToDict` is enabled (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary persisted in `proofreading-dict.txt` under the MarkEdit documents directory. Dictionary words are automatically loaded when the extension starts.

@@ -3,7 +3,7 @@ import { MarkEdit } from 'markedit-api';
 import { getProofreadingSettings } from './settings';
 import { presetDisabledRules } from './rules';
 import { presetDisabledKinds } from './kinds';
-import { loadWords, saveWords } from './dictionary';
+import { loadWords, saveWords } from './dict';
 
 const linter = new LocalLinter({ binary: binaryInlined });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
@@ -11,6 +11,8 @@ const disabledKinds = resolveDisabledKinds();
 const linterReady = configureLinter().catch(error => {
   console.warn('[MarkEdit-proofreading] Failed to configure linter.', error);
 });
+
+export const shouldAddToDict = settings.addToDict;
 
 export async function lint(text: string) {
   await linterReady;

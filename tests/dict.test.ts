@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseWords } from '../src/dictionary';
+import { parseWords } from '../src/dict';
 
 describe('parseWords', () => {
   it('splits content into trimmed non-empty words', () => {
