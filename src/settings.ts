@@ -10,13 +10,13 @@ type JSONValue = JSONObject[string];
 
 export interface ProofreadingSettings {
   lintPreset: LintPreset;
-  lintRules: LintConfig;
+  lintRuleOverrides: LintConfig;
 }
 
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
   const defaults: ProofreadingSettings = {
     lintPreset: 'standard',
-    lintRules: {},
+    lintRuleOverrides: {},
   };
 
   const root = asObject(userSettings);
@@ -27,11 +27,11 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
 
   const lintPreset = parseLintPreset(raw.lintPreset);
 
-  const lintRules = Object.fromEntries(
-    Object.entries(asObject(raw.lintRules) ?? {}).filter(([, value]) => isLintRuleValue(value)),
+  const lintRuleOverrides = Object.fromEntries(
+    Object.entries(asObject(raw.lintRuleOverrides) ?? {}).filter(([, value]) => isLintRuleValue(value)),
   ) as LintConfig;
 
-  return { lintPreset, lintRules };
+  return { lintPreset, lintRuleOverrides };
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {

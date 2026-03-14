@@ -18,7 +18,7 @@ export async function lint(text: string) {
 async function configureLinter() {
   const disabledRules = presetDisabledRules(settings.lintPreset);
 
-  if (disabledRules.length === 0 && Object.keys(settings.lintRules).length === 0) {
+  if (disabledRules.length === 0 && Object.keys(settings.lintRuleOverrides).length === 0) {
     return;
   }
 
@@ -31,7 +31,7 @@ async function configureLinter() {
   }
 
   // Apply user rule overrides on top
-  for (const [name, val] of Object.entries(settings.lintRules)) {
+  for (const [name, val] of Object.entries(settings.lintRuleOverrides)) {
     config[name] = val;
   }
 

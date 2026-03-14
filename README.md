@@ -16,7 +16,7 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 {
   "extension.markeditProofreading": {
     "lintPreset": "relaxed",
-    "lintRules": {
+    "lintRuleOverrides": {
       "SpelledNumbers": false,
       "NoOxfordComma": true
     }
@@ -25,7 +25,7 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 ```
 
 - `lintPreset`: `"strict"`, `"standard"` (default), or `"relaxed"`
-- `lintRules`: per-rule overrides (`true` / `false` / `null`) applied on top of the preset
+- `lintRuleOverrides`: per-rule overrides (`true` / `false` / `null`) applied on top of the preset
 
 For a full list of available rule names, see:
 https://writewithharper.com/docs/rules

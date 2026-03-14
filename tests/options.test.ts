@@ -7,14 +7,14 @@ describe('proofreading settings', () => {
     const settings = getProofreadingSettings(undefined);
 
     expect(settings.lintPreset).toBe('standard');
-    expect(settings.lintRules).toEqual({});
+    expect(settings.lintRuleOverrides).toEqual({});
   });
 
   it('parses lint preset, per-rule overrides from user settings', () => {
     const settings = getProofreadingSettings({
       'extension.markeditProofreading': {
         lintPreset: 'strict',
-        lintRules: {
+        lintRuleOverrides: {
           SpelledNumbers: true,
           NoOxfordComma: false,
           Keep: null,
@@ -24,7 +24,7 @@ describe('proofreading settings', () => {
     });
 
     expect(settings.lintPreset).toBe('strict');
-    expect(settings.lintRules).toEqual({
+    expect(settings.lintRuleOverrides).toEqual({
       SpelledNumbers: true,
       NoOxfordComma: false,
       Keep: null,
