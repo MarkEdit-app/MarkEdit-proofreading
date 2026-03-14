@@ -27,7 +27,11 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 
 - `lintPreset`: `"strict"`, `"standard"` (default), or `"relaxed"`
 - `lintRuleOverrides`: per-rule overrides (`true` / `false` / `null`) applied on top of the preset
-- `disabledLintKinds`: additional lint kinds to filter out (e.g. `"Regionalism"`, `"Enhancement"`)
+- `disabledLintKinds`: additional lint kinds to filter out, available kinds:
+  - `Agreement`, `BoundaryError`, `Capitalization`, `Eggcorn`, `Enhancement`
+  - `Formatting`, `Grammar`, `Malapropism`, `Miscellaneous`, `Nonstandard`
+  - `Punctuation`, `Readability`, `Redundancy`, `Regionalism`, `Repetition`
+  - `Spelling`, `Style`, `Typo`, `Usage`, `WordChoice`
 
 For a full list of available rule names, see:
 https://writewithharper.com/docs/rules
