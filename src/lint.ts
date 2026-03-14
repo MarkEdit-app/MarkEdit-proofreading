@@ -15,6 +15,8 @@ export async function lint(text: string) {
 }
 
 // Sample text designed to trigger rules from noisy lint kinds so we can discover and disable them.
+// Each line targets specific categories; this runs once at init and doesn't need to be exhaustive
+// since rules not triggered here keep their Harper defaults.
 const sampleText = [
   'This sentence is very good and I am very hungry.',
   'It was very cold outside despite of all odds.',
@@ -52,7 +54,7 @@ async function configureLinter() {
     const kindsSet = new Set(disabledKinds);
 
     for (const [ruleName, lints] of Object.entries(organized)) {
-      if (lints.length > 0 && kindsSet.has(lints[0].lint_kind())) {
+      if (lints.some(l => kindsSet.has(l.lint_kind()))) {
         config[ruleName] = false;
       }
     }
