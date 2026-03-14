@@ -261,7 +261,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     actions.appendChild(btn);
   }
 
-  if (diagnostic.problemText.length > 0) {
+  if (diagnostic.problemText) {
     const dict = document.createElement('button');
     dict.className = 'harper-ignore';
     dict.textContent = 'Add to Dictionary';
@@ -283,7 +283,9 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
   const ignore = document.createElement('button');
   ignore.className = 'harper-ignore';
-  ignore.style.marginLeft = diagnostic.problemText.length > 0 ? '0' : '';
+  if (diagnostic.problemText) {
+    ignore.style.marginLeft = '0';
+  }
   ignore.textContent = 'Ignore';
   ignore.onmousedown = (e) => e.preventDefault();
   ignore.onclick = () => {
