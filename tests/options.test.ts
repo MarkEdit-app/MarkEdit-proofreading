@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getProofreadingSettings } from '../src/settings';
-import { presetDisabledRules, presetDisabledKinds } from '../src/rules';
+import { presetDisabledRules } from '../src/rules';
+import { presetDisabledKinds } from '../src/kinds';
 
 describe('proofreading settings', () => {
   it('uses standard defaults when no settings are provided', () => {
@@ -8,6 +9,7 @@ describe('proofreading settings', () => {
 
     expect(settings.lintPreset).toBe('standard');
     expect(settings.lintRuleOverrides).toEqual({});
+    expect(settings.disabledLintKinds).toEqual([]);
   });
 
   it('parses lint preset, per-rule overrides from user settings', () => {
@@ -20,6 +22,7 @@ describe('proofreading settings', () => {
           Keep: null,
           InvalidStringValue: 'yes',
         },
+        disabledLintKinds: ['Regionalism', 'Enhancement'],
       },
     });
 
@@ -29,6 +32,17 @@ describe('proofreading settings', () => {
       NoOxfordComma: false,
       Keep: null,
     });
+    expect(settings.disabledLintKinds).toEqual(['Regionalism', 'Enhancement']);
+  });
+
+  it('filters non-string values from disabledLintKinds', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        disabledLintKinds: ['Enhancement', 42, true, 'Style'],
+      },
+    });
+
+    expect(settings.disabledLintKinds).toEqual(['Enhancement', 'Style']);
   });
 
   it('provides three presets with increasing disabled rule counts', () => {

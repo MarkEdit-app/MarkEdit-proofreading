@@ -11,12 +11,14 @@ type JSONValue = JSONObject[string];
 export interface ProofreadingSettings {
   lintPreset: LintPreset;
   lintRuleOverrides: LintConfig;
+  disabledLintKinds: string[];
 }
 
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
   const defaults: ProofreadingSettings = {
     lintPreset: 'standard',
     lintRuleOverrides: {},
+    disabledLintKinds: [],
   };
 
   const root = asObject(userSettings);
@@ -31,7 +33,9 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
     Object.entries(asObject(raw.lintRuleOverrides) ?? {}).filter(([, value]) => isLintRuleValue(value)),
   ) as LintConfig;
 
-  return { lintPreset, lintRuleOverrides };
+  const disabledLintKinds = parseStringArray(raw.disabledLintKinds);
+
+  return { lintPreset, lintRuleOverrides, disabledLintKinds };
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {
@@ -52,4 +56,12 @@ function asObject(value: JSONValue | undefined): JSONObject | undefined {
 
 function isLintRuleValue(value: JSONValue): value is boolean | null {
   return typeof value === 'boolean' || value === null;
+}
+
+function parseStringArray(value: JSONValue): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.filter((item): item is string => typeof item === 'string');
 }

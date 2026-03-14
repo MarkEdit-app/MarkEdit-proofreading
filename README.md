@@ -19,13 +19,15 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
     "lintRuleOverrides": {
       "SpelledNumbers": false,
       "NoOxfordComma": true
-    }
+    },
+    "disabledLintKinds": ["Regionalism"]
   }
 }
 ```
 
 - `lintPreset`: `"strict"`, `"standard"` (default), or `"relaxed"`
 - `lintRuleOverrides`: per-rule overrides (`true` / `false` / `null`) applied on top of the preset
+- `disabledLintKinds`: additional lint kinds to filter out (e.g. `"Regionalism"`, `"Enhancement"`)
 
 For a full list of available rule names, see:
 https://writewithharper.com/docs/rules
