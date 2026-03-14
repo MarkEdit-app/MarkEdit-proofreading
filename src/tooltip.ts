@@ -2,6 +2,7 @@ import { StateField, StateEffect } from '@codemirror/state';
 import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
+import { addToDictionary } from './lint';
 import type { Diagnostic } from './decoration';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
@@ -240,7 +241,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   msg.innerHTML = diagnostic.messageHtml;
   content.appendChild(msg);
 
-  // Actions: suggestion buttons + Ignore
+  // Actions: suggestion buttons + Add to Dictionary + Ignore
   const actions = document.createElement('div');
   actions.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; align-items: center;';
 
@@ -260,8 +261,29 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     actions.appendChild(btn);
   }
 
+  if (diagnostic.problemText.length > 0) {
+    const dict = document.createElement('button');
+    dict.className = 'harper-ignore';
+    dict.textContent = 'Add to Dictionary';
+    dict.onmousedown = (e) => e.preventDefault();
+    dict.onclick = () => {
+      const word = diagnostic.problemText;
+      void addToDictionary(word);
+      const { diagnostics } = view.state.field(diagnosticsField);
+      const filtered = diagnostics.filter(d => d.problemText !== word);
+      view.dispatch({
+        effects: [
+          setClickTooltip.of(null),
+          setDiagnosticsEffect.of(filtered),
+        ],
+      });
+    };
+    actions.appendChild(dict);
+  }
+
   const ignore = document.createElement('button');
   ignore.className = 'harper-ignore';
+  ignore.style.marginLeft = diagnostic.problemText.length > 0 ? '0' : '';
   ignore.textContent = 'Ignore';
   ignore.onmousedown = (e) => e.preventDefault();
   ignore.onclick = () => {

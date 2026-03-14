@@ -37,3 +37,9 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 
 For a full list of available rule names, see:
 https://writewithharper.com/docs/rules
+
+## Add to Dictionary
+
+When a word is flagged by the proofreader, clicking on it shows a tooltip with an **Add to Dictionary** button. This adds the word to a personal dictionary so it won't be flagged in future sessions.
+
+Dictionary words are persisted to `harper-dictionary.txt` in the MarkEdit library directory and automatically loaded when the extension starts.
