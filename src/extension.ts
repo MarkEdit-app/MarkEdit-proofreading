@@ -39,7 +39,7 @@ const lintScheduler = ViewPlugin.fromClass(class {
 
   async runLint() {
     const doc = this.view.state.doc;
-    const text = doc.sliceString(0);
+    const text = doc.toString();
     const lints = await lint(text);
 
     if (this.view.state.doc !== doc) {

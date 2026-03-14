@@ -32,7 +32,7 @@ export function buildMenuItem(): MenuItem {
 
 async function proofreadNow() {
   const view = MarkEdit.editorView;
-  const text = view.state.doc.sliceString(0);
+  const text = view.state.doc.toString();
   const lints = await lint(text);
   view.dispatch({ effects: setDiagnosticsEffect.of(lints.map(lintToDiagnostic)) });
 }
