@@ -29,8 +29,13 @@ export async function lint(text: string) {
 export async function addToDictionary(word: string): Promise<void> {
   await linterReady;
   await linter.importWords([word]);
-  const words = await linter.exportWords();
-  await saveWords(words);
+
+  // Read from disk (not Harper memory) to preserve words added by other editors
+  const existing = await loadWords();
+  if (!existing.includes(word)) {
+    existing.push(word);
+    await saveWords(existing);
+  }
 }
 
 function resolveDisabledKinds(): ReadonlySet<string> {
