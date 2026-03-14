@@ -9,6 +9,7 @@ type JSONObject = MarkEdit['userSettings'];
 type JSONValue = JSONObject[string];
 
 export interface ProofreadingSettings {
+  autoLintDelay: number;
   lintPreset: LintPreset;
   lintRuleOverrides: LintConfig;
   disabledLintKinds: string[];
@@ -16,6 +17,7 @@ export interface ProofreadingSettings {
 
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
   const defaults: ProofreadingSettings = {
+    autoLintDelay: 1000,
     lintPreset: 'standard',
     lintRuleOverrides: {},
     disabledLintKinds: [],
@@ -28,6 +30,7 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
   }
 
   const lintPreset = parseLintPreset(raw.lintPreset);
+  const autoLintDelay = parseAutoLintDelay(raw.autoLintDelay);
 
   const lintRuleOverrides = Object.fromEntries(
     Object.entries(asObject(raw.lintRuleOverrides) ?? {}).filter(([, value]) => isLintRuleValue(value)),
@@ -35,7 +38,7 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
 
   const disabledLintKinds = parseStringArray(raw.disabledLintKinds);
 
-  return { lintPreset, lintRuleOverrides, disabledLintKinds };
+  return { autoLintDelay, lintPreset, lintRuleOverrides, disabledLintKinds };
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {
@@ -44,6 +47,14 @@ function parseLintPreset(value: JSONValue): LintPreset {
   }
 
   return 'standard';
+}
+
+function parseAutoLintDelay(value: JSONValue): number {
+  if (typeof value === 'number' && (value === -1 || value > 0)) {
+    return value;
+  }
+
+  return 1000;
 }
 
 function asObject(value: JSONValue | undefined): JSONObject | undefined {

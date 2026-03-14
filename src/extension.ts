@@ -2,12 +2,14 @@ import { ViewPlugin } from '@codemirror/view';
 import type { ViewUpdate } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+import { MarkEdit } from 'markedit-api';
 import { diagnosticsField, setDiagnosticsEffect, lintToDiagnostic } from './decoration';
 import { clickTooltipField, tooltipHandlers } from './tooltip';
 import { baseTheme, kindCSS } from './styling';
 import { lint } from './lint';
+import { getProofreadingSettings } from './settings';
 
-const lintDelay = 500;
+const { autoLintDelay } = getProofreadingSettings(MarkEdit.userSettings);
 
 const kindStyleInjector = ViewPlugin.define(() => {
   if (!document.getElementById('harper-kind-styles')) {
@@ -34,7 +36,7 @@ const lintScheduler = ViewPlugin.fromClass(class {
 
   scheduleLint() {
     clearTimeout(this.timeout);
-    this.timeout = setTimeout(() => { void this.runLint(); }, lintDelay);
+    this.timeout = setTimeout(() => { void this.runLint(); }, autoLintDelay);
   }
 
   async runLint() {
@@ -55,5 +57,11 @@ const lintScheduler = ViewPlugin.fromClass(class {
 });
 
 export function proofreadingExtension(): Extension {
-  return [diagnosticsField, lintScheduler, clickTooltipField, tooltipHandlers, baseTheme, kindStyleInjector];
+  const extensions: Extension[] = [diagnosticsField, clickTooltipField, tooltipHandlers, baseTheme, kindStyleInjector];
+
+  if (autoLintDelay !== -1) {
+    extensions.push(lintScheduler);
+  }
+
+  return extensions;
 }
