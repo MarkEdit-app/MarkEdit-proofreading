@@ -1,24 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { buildMenuItems } from '../src/menu';
+import { buildMenuItem } from '../src/menu';
 
-describe('buildMenuItems', () => {
+describe('buildMenuItem', () => {
   it('returns the expected menu structure', () => {
-    const items = buildMenuItems();
+    const item = buildMenuItem();
 
-    expect(items).toHaveLength(5);
+    expect(item.title).toBe('Proofread');
+    expect(item.icon).toBe('text.badge.checkmark');
 
-    expect(items[0].title).toBe('Proofread Now');
-    expect(typeof items[0].action).toBe('function');
+    const children = item.children!;
+    expect(children).toHaveLength(5);
 
-    expect(items[1].title).toBe('Ignore All');
-    expect(typeof items[1].action).toBe('function');
+    expect(children[0].title).toBe('Proofread Now');
+    expect(typeof children[0].action).toBe('function');
 
-    expect(items[2].separator).toBe(true);
+    expect(children[1].title).toBe('Ignore All');
+    expect(typeof children[1].action).toBe('function');
 
-    expect(items[3].title).toMatch(/^Version \S+/);
-    expect(typeof items[3].action).toBe('function');
+    expect(children[2].separator).toBe(true);
 
-    expect(items[4].title).toBe('Check Release (GitHub)');
-    expect(typeof items[4].action).toBe('function');
+    expect(children[3].title).toMatch(/^Version \S+/);
+    expect(typeof children[3].action).toBe('function');
+
+    expect(children[4].title).toBe('Check Release (GitHub)');
+    expect(typeof children[4].action).toBe('function');
   });
 });

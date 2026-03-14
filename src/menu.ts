@@ -5,30 +5,34 @@ import { lint } from './lint';
 
 const repoUrl = 'https://github.com/MarkEdit-app/MarkEdit-proofreading';
 
-export function buildMenuItems(): MenuItem[] {
-  return [
-    {
-      title: 'Proofread Now',
-      action: proofreadNow,
-    },
-    {
-      title: 'Ignore All',
-      action: ignoreAll,
-    },
-    { separator: true },
-    {
-      title: `Version ${__PKG_VERSION__}`,
-      action: () => open(`${repoUrl}/releases/tag/v${__PKG_VERSION__}`),
-    },
-    {
-      title: 'Check Release (GitHub)',
-      action: () => open(`${repoUrl}/releases`),
-    },
-  ];
+export function buildMenuItem(): MenuItem {
+  return {
+    title: 'Proofread',
+    icon: 'text.badge.checkmark',
+    children: [
+      {
+        title: 'Proofread Now',
+        action: proofreadNow,
+      },
+      {
+        title: 'Ignore All',
+        action: ignoreAll,
+      },
+      { separator: true },
+      {
+        title: `Version ${__PKG_VERSION__}`,
+        action: () => open(`${repoUrl}/releases/tag/v${__PKG_VERSION__}`),
+      },
+      {
+        title: 'Check Release (GitHub)',
+        action: () => open(`${repoUrl}/releases`),
+      },
+    ],
+  };
 }
 
 export function addMenuItems() {
-  MarkEdit.addMainMenuItem(buildMenuItems());
+  MarkEdit.addMainMenuItem(buildMenuItem());
 }
 
 async function proofreadNow() {
