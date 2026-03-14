@@ -11,6 +11,7 @@ describe('proofreading settings', () => {
     expect(settings.lintPreset).toBe('standard');
     expect(settings.lintRuleOverrides).toEqual({});
     expect(settings.disabledLintKinds).toEqual([]);
+    expect(settings.addToDict).toBe(true);
   });
 
   it('parses lint preset, per-rule overrides from user settings', () => {
@@ -118,5 +119,21 @@ describe('proofreading settings', () => {
     expect(getProofreadingSettings({
       'extension.markeditProofreading': { autoLintDelay: 'fast' },
     }).autoLintDelay).toBe(1000);
+  });
+
+  it('defaults addToDict to true and allows disabling', () => {
+    expect(getProofreadingSettings(undefined).addToDict).toBe(true);
+
+    expect(getProofreadingSettings({
+      'extension.markeditProofreading': { addToDict: false },
+    }).addToDict).toBe(false);
+
+    expect(getProofreadingSettings({
+      'extension.markeditProofreading': { addToDict: true },
+    }).addToDict).toBe(true);
+
+    expect(getProofreadingSettings({
+      'extension.markeditProofreading': { addToDict: 'yes' },
+    }).addToDict).toBe(true);
   });
 });

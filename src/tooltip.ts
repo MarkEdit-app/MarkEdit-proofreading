@@ -2,6 +2,7 @@ import { StateField, StateEffect } from '@codemirror/state';
 import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
+import { addToDictionary, shouldAddToDict } from './lint';
 import type { Diagnostic } from './decoration';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
@@ -265,6 +266,9 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   ignore.textContent = 'Ignore';
   ignore.onmousedown = (e) => e.preventDefault();
   ignore.onclick = () => {
+    if (shouldAddToDict && diagnostic.problemText) {
+      void addToDictionary(diagnostic.problemText);
+    }
     const { diagnostics } = view.state.field(diagnosticsField);
     const filtered = diagnostics.filter(d =>
       !(d.from === diagnostic.from && d.to === diagnostic.to && d.lintKind === diagnostic.lintKind),

@@ -17,6 +17,7 @@ describe('lintToDiagnostic', () => {
       lint_kind: () => 'Style',
       lint_kind_pretty: () => 'Style',
       message_html: () => '<p>Use another word</p>',
+      get_problem_text: () => 'word',
       suggestions: () => [
         makeSuggestion(SuggestionKind.Remove, ''),
         makeSuggestion(SuggestionKind.InsertAfter, 'ed'),
@@ -32,6 +33,7 @@ describe('lintToDiagnostic', () => {
       lintKind: 'Style',
       title: 'Style',
       messageHtml: '<p>Use another word</p>',
+      problemText: 'word',
     });
 
     expect(diagnostic.actions.map(a => a.name)).toEqual(['Remove', 'Insert "ed"', 'fixed']);
@@ -43,6 +45,7 @@ describe('lintToDiagnostic', () => {
       lint_kind: () => 'Typo',
       lint_kind_pretty: () => 'Typo',
       message_html: () => '<p>Typo</p>',
+      get_problem_text: () => 'typo',
       suggestions: () => [
         makeSuggestion(SuggestionKind.Remove, ''),
         makeSuggestion(SuggestionKind.Replace, 'word'),
