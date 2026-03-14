@@ -7,7 +7,7 @@ export type LintPreset = 'strict' | 'standard' | 'relaxed';
 
 // Rules disabled in the "standard" preset (Enhancement, Style, WordChoice).
 // Rule names from https://writewithharper.com/docs/rules
-const standardDisabledRules: string[] = [
+const standardDisabledRules: readonly string[] = [
   // Enhancement
   'BoringWords', 'Excellent', 'Freezing', 'Starving',
   // Style
@@ -25,8 +25,9 @@ const standardDisabledRules: string[] = [
   'LastNight', 'ModalOf', 'RoadMap', 'TongueInCheek', 'VeryUnique', 'WaveFunction',
 ];
 
-// Additional rules disabled in the "relaxed" preset (Readability, Redundancy, Repetition).
-const relaxedDisabledRules: string[] = [
+// All rules disabled in the "relaxed" preset (standard + Readability, Redundancy, Repetition).
+const relaxedDisabledRules: readonly string[] = [
+  ...standardDisabledRules,
   // Readability
   'LongSentences',
   // Redundancy
@@ -38,14 +39,14 @@ const relaxedDisabledRules: string[] = [
   'RepeatedWords',
 ];
 
-export function presetDisabledRules(preset: LintPreset): string[] {
+export function presetDisabledRules(preset: LintPreset): readonly string[] {
   switch (preset) {
     case 'strict':
       return [];
     case 'standard':
       return standardDisabledRules;
     case 'relaxed':
-      return [...standardDisabledRules, ...relaxedDisabledRules];
+      return relaxedDisabledRules;
   }
 }
 
