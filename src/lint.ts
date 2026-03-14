@@ -1,18 +1,25 @@
 import { LocalLinter, binaryInlined, type LintConfig } from 'harper.js';
 import { MarkEdit } from 'markedit-api';
 import { getProofreadingSettings } from './settings';
-import { presetDisabledRules } from './rules';
+import { presetDisabledRules, presetDisabledKinds } from './rules';
 
 const linter = new LocalLinter({ binary: binaryInlined });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
+const disabledKinds = presetDisabledKinds(settings.lintPreset);
 const configureLinterPromise = configureLinter().catch(error => {
   console.warn('[markedit-proofreading] Failed to configure linter.', error);
 });
 
 export async function lint(text: string) {
   await configureLinterPromise;
+  const lints = await linter.lint(text);
 
-  return linter.lint(text);
+  // Post-filter by kind as a safety net for rules not covered by the static lists
+  if (disabledKinds.size === 0) {
+    return lints;
+  }
+
+  return lints.filter(lint => !disabledKinds.has(lint.lint_kind()));
 }
 
 async function configureLinter() {

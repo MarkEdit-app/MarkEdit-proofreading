@@ -20,9 +20,8 @@ const standardDisabledRules: readonly string[] = [
   'LastNight', 'ModalOf', 'RoadMap', 'TongueInCheek', 'VeryUnique', 'WaveFunction',
 ];
 
-// All rules disabled in the "relaxed" preset (standard + Readability, Redundancy, Repetition).
-const relaxedDisabledRules: readonly string[] = [
-  ...standardDisabledRules,
+// Additional rules disabled in the "relaxed" preset (Readability, Redundancy, Repetition).
+const relaxedOnlyDisabledRules: readonly string[] = [
   // Readability
   'LongSentences',
   // Redundancy
@@ -34,6 +33,15 @@ const relaxedDisabledRules: readonly string[] = [
   'RepeatedWords',
 ];
 
+const relaxedDisabledRules: readonly string[] = [
+  ...standardDisabledRules,
+  ...relaxedOnlyDisabledRules,
+];
+
+// Lint kinds disabled per preset, used as a safety net to catch rules not in static lists.
+const standardDisabledKinds: readonly string[] = ['Enhancement', 'Style', 'WordChoice'];
+const relaxedDisabledKinds: readonly string[] = [...standardDisabledKinds, 'Readability', 'Redundancy', 'Repetition'];
+
 export function presetDisabledRules(preset: LintPreset): readonly string[] {
   switch (preset) {
     case 'strict':
@@ -42,5 +50,16 @@ export function presetDisabledRules(preset: LintPreset): readonly string[] {
       return standardDisabledRules;
     case 'relaxed':
       return relaxedDisabledRules;
+  }
+}
+
+export function presetDisabledKinds(preset: LintPreset): ReadonlySet<string> {
+  switch (preset) {
+    case 'strict':
+      return new Set();
+    case 'standard':
+      return new Set(standardDisabledKinds);
+    case 'relaxed':
+      return new Set(relaxedDisabledKinds);
   }
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getProofreadingSettings } from '../src/settings';
-import { presetDisabledRules } from '../src/rules';
+import { presetDisabledRules, presetDisabledKinds } from '../src/rules';
 
 describe('proofreading settings', () => {
   it('uses standard defaults when no settings are provided', () => {
@@ -43,6 +43,21 @@ describe('proofreading settings', () => {
     // relaxed includes all standard rules plus more
     for (const rule of standard) {
       expect(relaxed).toContain(rule);
+    }
+  });
+
+  it('provides matching disabled kinds for each preset', () => {
+    const strict = presetDisabledKinds('strict');
+    const standard = presetDisabledKinds('standard');
+    const relaxed = presetDisabledKinds('relaxed');
+
+    expect(strict.size).toBe(0);
+    expect(standard).toEqual(new Set(['Enhancement', 'Style', 'WordChoice']));
+    expect(relaxed).toEqual(new Set(['Enhancement', 'Style', 'WordChoice', 'Readability', 'Redundancy', 'Repetition']));
+
+    // relaxed includes all standard kinds
+    for (const kind of standard) {
+      expect(relaxed.has(kind)).toBe(true);
     }
   });
 
