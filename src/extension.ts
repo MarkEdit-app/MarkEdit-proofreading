@@ -21,14 +21,14 @@ const kindStyleInjector = ViewPlugin.define(() => {
   return {};
 });
 
-export function disableNativeSpellcheck(editorDom: Pick<HTMLElement, 'getAttribute' | 'setAttribute'>) {
+export function ensureNativeSpellcheckDisabled(editorDom: Pick<HTMLElement, 'getAttribute' | 'setAttribute'>) {
   if (editorDom.getAttribute('spellcheck') !== 'false') {
     editorDom.setAttribute('spellcheck', 'false');
   }
 }
 
 const nativeSpellcheckDisabler = ViewPlugin.define((view: EditorView) => {
-  disableNativeSpellcheck(view.dom);
+  ensureNativeSpellcheckDisabled(view.dom);
   return {};
 });
 

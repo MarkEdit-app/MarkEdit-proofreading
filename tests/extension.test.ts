@@ -1,26 +1,30 @@
 import { describe, expect, it, vi } from 'vitest';
-import { disableNativeSpellcheck } from '../src/extension';
+import { ensureNativeSpellcheckDisabled } from '../src/extension';
 
-describe('disableNativeSpellcheck', () => {
+describe('ensureNativeSpellcheckDisabled', () => {
   it('sets spellcheck=false when it is not already disabled', () => {
-    const editorDom = {
-      getAttribute: vi.fn(() => null),
-      setAttribute: vi.fn(),
+    const getAttribute: Pick<HTMLElement, 'getAttribute'>['getAttribute'] = vi.fn(() => null);
+    const setAttribute: Pick<HTMLElement, 'setAttribute'>['setAttribute'] = vi.fn();
+    const editorDom: Pick<HTMLElement, 'getAttribute' | 'setAttribute'> = {
+      getAttribute,
+      setAttribute,
     };
 
-    disableNativeSpellcheck(editorDom);
+    ensureNativeSpellcheckDisabled(editorDom);
 
-    expect(editorDom.setAttribute).toHaveBeenCalledWith('spellcheck', 'false');
+    expect(setAttribute).toHaveBeenCalledWith('spellcheck', 'false');
   });
 
   it('does not write spellcheck attribute when already false', () => {
-    const editorDom = {
-      getAttribute: vi.fn(() => 'false'),
-      setAttribute: vi.fn(),
+    const getAttribute: Pick<HTMLElement, 'getAttribute'>['getAttribute'] = vi.fn(() => 'false');
+    const setAttribute: Pick<HTMLElement, 'setAttribute'>['setAttribute'] = vi.fn();
+    const editorDom: Pick<HTMLElement, 'getAttribute' | 'setAttribute'> = {
+      getAttribute,
+      setAttribute,
     };
 
-    disableNativeSpellcheck(editorDom);
+    ensureNativeSpellcheckDisabled(editorDom);
 
-    expect(editorDom.setAttribute).not.toHaveBeenCalled();
+    expect(setAttribute).not.toHaveBeenCalled();
   });
 });
