@@ -4,7 +4,7 @@
 
 ## Configuration
 
-This extension provides three presets to control how aggressively Harper checks your writing. Presets work by disabling specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules):
+This extension provides three presets to control how aggressively Harper checks your writing. Presets disable specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules):
 
 - `"strict"`: All Harper rules are active
 - `"standard"` (default): Disables Enhancement, Style, and WordChoice rules

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getProofreadingSettings, presetDisabledKinds } from '../src/settings';
+import { getProofreadingSettings, presetDisabledRules } from '../src/settings';
 
 describe('proofreading settings', () => {
   it('uses standard defaults when no settings are provided', () => {
@@ -30,10 +30,19 @@ describe('proofreading settings', () => {
     });
   });
 
-  it('defines disabled lint kinds for three presets', () => {
-    expect(presetDisabledKinds.strict).toEqual([]);
-    expect(presetDisabledKinds.standard).toEqual(['Enhancement', 'Style', 'WordChoice']);
-    expect(presetDisabledKinds.relaxed).toEqual(['Enhancement', 'Readability', 'Redundancy', 'Repetition', 'Style', 'WordChoice']);
+  it('provides three presets with increasing disabled rule counts', () => {
+    const strict = presetDisabledRules('strict');
+    const standard = presetDisabledRules('standard');
+    const relaxed = presetDisabledRules('relaxed');
+
+    expect(strict).toEqual([]);
+    expect(standard.length).toBeGreaterThan(0);
+    expect(relaxed.length).toBeGreaterThan(standard.length);
+
+    // relaxed includes all standard rules plus more
+    for (const rule of standard) {
+      expect(relaxed).toContain(rule);
+    }
   });
 
   it('falls back to standard for unrecognized preset values', () => {
