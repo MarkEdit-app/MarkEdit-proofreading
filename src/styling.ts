@@ -54,6 +54,11 @@ const fallbackDark = '#9CA3AF';
 export function kindCSS(): string {
   let css = '';
 
+  // Suppress native spellcheck underline only on elements already marked by Harper,
+  // so words not flagged by Harper still show the native dotted underline.
+  // Note: ::spelling-error/::grammar-error support varies by engine.
+  css += `.cm-harper-lint ::spelling-error, .cm-harper-lint ::grammar-error { text-decoration: none; }\n`;
+
   // Default: lighter underline, subtle bg
   css += `.cm-harper-lint { text-decoration: underline solid ${fallback}aa 2px; background-color: ${fallback}11; }\n`;
   css += `.cm-harper-lint:hover { text-decoration-color: ${fallback}; background-color: ${fallback}22; }\n`;
