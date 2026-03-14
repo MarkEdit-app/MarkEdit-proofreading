@@ -4,11 +4,11 @@ import { presetDisabledRules } from '../src/rules';
 import { presetDisabledKinds } from '../src/kinds';
 
 describe('proofreading settings', () => {
-  it('uses standard defaults when no settings are provided', () => {
+  it('uses strict defaults when no settings are provided', () => {
     const settings = getProofreadingSettings(undefined);
 
     expect(settings.autoLintDelay).toBe(1000);
-    expect(settings.lintPreset).toBe('standard');
+    expect(settings.lintPreset).toBe('strict');
     expect(settings.lintRuleOverrides).toEqual({});
     expect(settings.disabledLintKinds).toEqual([]);
     expect(settings.addToDict).toBe(true);
@@ -77,14 +77,14 @@ describe('proofreading settings', () => {
     }
   });
 
-  it('falls back to standard for unrecognized preset values', () => {
+  it('falls back to strict for unrecognized preset values', () => {
     const settings = getProofreadingSettings({
       'extension.markeditProofreading': {
         lintPreset: 'unknown',
       },
     });
 
-    expect(settings.lintPreset).toBe('standard');
+    expect(settings.lintPreset).toBe('strict');
   });
 
   it('parses autoLintDelay from user settings', () => {

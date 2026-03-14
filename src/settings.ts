@@ -19,7 +19,7 @@ export interface ProofreadingSettings {
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
   const defaults: ProofreadingSettings = {
     autoLintDelay: 1000,
-    lintPreset: 'standard',
+    lintPreset: 'strict',
     lintRuleOverrides: {},
     disabledLintKinds: [],
     addToDict: true,
@@ -49,7 +49,7 @@ function parseLintPreset(value: JSONValue): LintPreset {
     return value;
   }
 
-  return 'standard';
+  return 'strict';
 }
 
 function parseAutoLintDelay(value: JSONValue): number {
