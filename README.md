@@ -6,8 +6,8 @@
 
 This extension provides three presets to control how aggressively Harper checks your writing. Presets disable specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules) and filter by lint kind as a safety net:
 
-- `"strict"`: All Harper rules are active
-- `"standard"` (default): Disables Enhancement, Style, and WordChoice rules
+- `"strict"` (default): All Harper rules are active
+- `"standard"`: Disables Enhancement, Style, and WordChoice rules
 - `"relaxed"`: Also disables Readability, Redundancy, and Repetition rules
 
 You can customize behavior from `settings.json` with the `extension.markeditProofreading` section (see [MarkEdit advanced settings](https://github.com/MarkEdit-app/MarkEdit/wiki/Customization#advanced-settings)):
@@ -29,7 +29,7 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 
 - `autoLintDelay`: Delay in milliseconds before automatic proofreading runs after a document change (default: `1000`). Set to `-1` to disable automatic proofreading entirely (use "Proofread Now" to lint on demand)
 - `addToDict`: When `true` (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary so it won't be flagged in future sessions. Set to `false` to disable this behavior
-- `lintPreset`: `"strict"`, `"standard"` (default), or `"relaxed"`
+- `lintPreset`: `"strict"` (default), `"standard"`, or `"relaxed"`
 - `lintRuleOverrides`: Per-rule overrides (`true` / `false` / `null`) applied on top of the preset
 - `disabledLintKinds`: Additional lint kinds to filter out, available kinds:
   - `Agreement`, `BoundaryError`, `Capitalization`, `Eggcorn`, `Enhancement`
