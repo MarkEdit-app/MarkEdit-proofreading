@@ -1,6 +1,6 @@
 import { MarkEdit } from 'markedit-api';
 import { proofreadingExtension } from './src/extension';
-import { addMenuItems } from './src/menu';
+import { buildMenuItem } from './src/menu';
 
 MarkEdit.addExtension(proofreadingExtension());
-addMenuItems();
+MarkEdit.addMainMenuItem(buildMenuItem());

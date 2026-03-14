@@ -2,8 +2,7 @@ import { MarkEdit } from 'markedit-api';
 import type { MenuItem } from 'markedit-api';
 import { setDiagnosticsEffect, lintToDiagnostic } from './decoration';
 import { lint } from './lint';
-
-const repoUrl = 'https://github.com/MarkEdit-app/MarkEdit-proofreading';
+import { repoUrl } from './const';
 
 export function buildMenuItem(): MenuItem {
   return {
@@ -29,10 +28,6 @@ export function buildMenuItem(): MenuItem {
       },
     ],
   };
-}
-
-export function addMenuItems() {
-  MarkEdit.addMainMenuItem(buildMenuItem());
 }
 
 async function proofreadNow() {
