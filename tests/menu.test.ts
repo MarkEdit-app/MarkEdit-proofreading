@@ -22,7 +22,7 @@ describe('buildMenuItem', () => {
     expect(children[3].title).toMatch(/^Version \S+/);
     expect(typeof children[3].action).toBe('function');
 
-    expect(children[4].title).toBe('Check Release (GitHub)');
+    expect(children[4].title).toBe('Check Releases (GitHub)');
     expect(typeof children[4].action).toBe('function');
   });
 });

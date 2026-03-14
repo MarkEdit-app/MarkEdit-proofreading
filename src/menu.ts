@@ -23,7 +23,7 @@ export function buildMenuItem(): MenuItem {
         action: () => open(`${repoUrl}/releases/tag/v${__PKG_VERSION__}`),
       },
       {
-        title: 'Check Release (GitHub)',
+        title: 'Check Releases (GitHub)',
         action: () => open(`${repoUrl}/releases`),
       },
     ],
