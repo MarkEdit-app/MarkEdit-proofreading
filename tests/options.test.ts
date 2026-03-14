@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getProofreadingSettings, presetDisabledRules } from '../src/settings';
+import { getProofreadingSettings } from '../src/settings';
+import { presetDisabledRules } from '../src/rules';
 
 describe('proofreading settings', () => {
   it('uses standard defaults when no settings are provided', () => {

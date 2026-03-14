@@ -1,6 +1,7 @@
 import { LocalLinter, binaryInlined, type LintConfig } from 'harper.js';
 import { MarkEdit } from 'markedit-api';
-import { getProofreadingSettings, presetDisabledRules } from './settings';
+import { getProofreadingSettings } from './settings';
+import { presetDisabledRules } from './rules';
 
 const linter = new LocalLinter({ binary: binaryInlined });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
