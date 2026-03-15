@@ -1,10 +1,9 @@
 import { StateField, StateEffect } from '@codemirror/state';
 import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
-import { diagnosticsField, setDiagnosticsEffect } from './decoration';
-import { addToDictionary, shouldAddToDict } from './lint';
-import { kindColors, kindColorsDark } from './styling';
+import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
+import { setAccentColor, buildCardContent, ignoreDiagnostic, injectCardCSS } from './card';
 
 export const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
@@ -75,7 +74,9 @@ export const tooltipHandlers = EditorView.domEventHandlers({
   },
 });
 
-const cardCSS = `
+// Tooltip-specific CSS — container, backdrop, close button, and size overrides
+// for the shared `.harper-msg`, `.harper-btn`, `.harper-ignore` base styles.
+const tooltipCSS = `
   .harper-card {
     position: relative;
     border-radius: 10px;
@@ -114,48 +115,10 @@ const cardCSS = `
     justify-content: center;
   }
   .harper-card .harper-close:hover { color: #444; }
-  .harper-card .harper-msg { color: #222222; }
-  .harper-card .harper-msg p {
-    margin: 0px;
-  }
-  .harper-card .harper-msg code {
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-    font-size: 12px;
-    padding: 1px 4px;
-    border-radius: 4px;
-    color: var(--harper-kind-color, #24292f);
-    background: color-mix(in srgb, var(--harper-kind-color, #6c757d) 10%, transparent);
-  }
-  .harper-card .harper-btn {
-    padding: 2px 6px;
-    border: 1px solid #d0d7de;
-    border-radius: 6px;
-    background: #f6f8fa;
-    color: #24292f;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: inherit;
-    line-height: 1.4;
-  }
-  .harper-card .harper-btn:hover {
-    background: #eaeef2;
-    border-color: #afb8c1;
-  }
-  .harper-card .harper-ignore {
-    padding: 2px 6px;
-    border: 1px solid #c0c0c0;
-    border-radius: 6px;
-    background: transparent;
-    color: #555;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 400;
-    font-family: inherit;
-    line-height: 1.4;
-    margin-left: auto;
-  }
-  .harper-card .harper-ignore:hover { background: rgba(0, 0, 0, 0.05); border-color: #999; }
+  .harper-card .harper-msg { color: #222222; font-size: 13px; margin: 8px 0 25px; }
+  .harper-card .harper-msg code { font-size: 12px; padding: 1px 4px; }
+  .harper-card .harper-btn { padding: 2px 6px; font-size: 12px; }
+  .harper-card .harper-ignore { padding: 2px 6px; font-size: 12px; }
   @media (prefers-color-scheme: dark) {
     .harper-card {
       background: rgba(40, 40, 40, 0.4);
@@ -168,44 +131,22 @@ const cardCSS = `
     .harper-card .harper-close { color: #777; }
     .harper-card .harper-close:hover { color: #bbb; }
     .harper-card .harper-msg { color: #cccccc; }
-    .harper-card .harper-msg code {
-      color: var(--harper-kind-color-dark, #f0f0f0);
-      background: color-mix(in srgb, var(--harper-kind-color-dark, #B8C0CC) 15%, transparent);
-    }
-    .harper-card .harper-btn {
-      border-color: #464a4f;
-      background: #323639;
-      color: #e2e4e8;
-    }
-    .harper-card .harper-btn:hover {
-      background: #3a3e42;
-      border-color: #525659;
-    }
-    .harper-card .harper-ignore {
-      border-color: #555;
-      background: transparent;
-      color: #bbb;
-    }
-    .harper-card .harper-ignore:hover { background: rgba(255, 255, 255, 0.08); border-color: #666; }
   }
 `;
 
 function createTooltip(view: EditorView, diagnostic: Diagnostic) {
-  if (!document.getElementById('harper-card-styles')) {
+  injectCardCSS();
+
+  if (!document.getElementById('harper-tooltip-styles')) {
     const style = document.createElement('style');
-    style.id = 'harper-card-styles';
-    style.textContent = cardCSS;
+    style.id = 'harper-tooltip-styles';
+    style.textContent = tooltipCSS;
     document.head.appendChild(style);
   }
 
   const dom = document.createElement('div');
   dom.className = 'harper-card';
-
-  // Set accent color custom properties for code elements
-  const fallback = '#6c757d';
-  const fallbackDark = '#B8C0CC';
-  dom.style.setProperty('--harper-kind-color', kindColors[diagnostic.lintKind] ?? fallback);
-  dom.style.setProperty('--harper-kind-color-dark', kindColorsDark[diagnostic.lintKind] ?? fallbackDark);
+  setAccentColor(dom, diagnostic.lintKind);
 
   // Background layer for translucent blended color
   const bg = document.createElement('div');
@@ -242,59 +183,13 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   badge.textContent = diagnostic.title;
   content.appendChild(badge);
 
-  // Message with HTML rendering
-  const msg = document.createElement('div');
-  msg.className = 'harper-msg';
-  msg.style.cssText = `
-    font-size: 13px;
-    line-height: 1.5;
-    margin: 8px 0 25px;
-  `;
-  msg.innerHTML = diagnostic.messageHtml;
-  content.appendChild(msg);
+  // Shared card content: message + actions (suggestion buttons + ignore)
+  buildCardContent(content, view, diagnostic, {
+    onIgnore: (_container, diag) => {
+      ignoreDiagnostic(view, diag, [setClickTooltip.of(null)]);
+    },
+  });
 
-  // Actions: suggestion buttons + Ignore
-  const actions = document.createElement('div');
-  actions.style.cssText = 'display: flex; flex-wrap: wrap; gap: 6px; align-items: center;';
-
-  for (const action of diagnostic.actions) {
-    const btn = document.createElement('button');
-    btn.className = 'harper-btn';
-    btn.textContent = action.name;
-    btn.onmousedown = (e) => e.preventDefault();
-    btn.onclick = () => {
-      const current = view.state.field(diagnosticsField).diagnostics.find(d =>
-        d.from === diagnostic.from && d.to === diagnostic.to,
-      );
-      if (current) {
-        action.apply(view, current.from, current.to);
-      }
-    };
-    actions.appendChild(btn);
-  }
-
-  const ignore = document.createElement('button');
-  ignore.className = 'harper-ignore';
-  ignore.textContent = 'Ignore';
-  ignore.onmousedown = (e) => e.preventDefault();
-  ignore.onclick = () => {
-    if (shouldAddToDict && diagnostic.problemText) {
-      void addToDictionary(diagnostic.problemText);
-    }
-    const { diagnostics } = view.state.field(diagnosticsField);
-    const filtered = diagnostics.filter(d =>
-      !(d.from === diagnostic.from && d.to === diagnostic.to && d.lintKind === diagnostic.lintKind),
-    );
-    view.dispatch({
-      effects: [
-        setClickTooltip.of(null),
-        setDiagnosticsEffect.of(filtered),
-      ],
-    });
-  };
-  actions.appendChild(ignore);
-
-  content.appendChild(actions);
   dom.appendChild(content);
 
   return {

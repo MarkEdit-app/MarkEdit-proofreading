@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { paneCSS } from '../src/panel';
+import { cardContentCSS } from '../src/card';
 
 describe('paneCSS', () => {
   it('includes core pane class rules', () => {
@@ -53,10 +54,10 @@ describe('paneCSS', () => {
     expect(css).toMatch(/\.harper-pane-section-heading\s+\.harper-badge\s*\{[^}]*padding:\s*3px\s+8px/);
   });
 
-  it('styles code elements with accent color', () => {
+  it('overrides shared code element sizes for pane context', () => {
     const css = paneCSS();
-    expect(css).toMatch(/\.harper-pane-msg\s+code\s*\{[^}]*color:\s*var\(--harper-kind-color/);
-    expect(css).toMatch(/\.harper-pane-msg\s+code\s*\{[^}]*background:\s*color-mix/);
+    expect(css).toMatch(/\.harper-pane-item\s+\.harper-msg\s+code\s*\{[^}]*font-size:\s*11px/);
+    expect(css).toMatch(/\.harper-pane-item\s+\.harper-msg\s+code\s*\{[^}]*padding:\s*1px\s+5px/);
   });
 
   it('includes slide animation styles', () => {
@@ -86,5 +87,27 @@ describe('paneCSS', () => {
     expect(css).toContain('.harper-pane-empty');
     expect(css).toContain('.harper-pane-section');
     expect(css).toContain('.harper-pane-count');
+  });
+});
+
+describe('cardContentCSS', () => {
+  it('includes accent-colored code elements', () => {
+    const css = cardContentCSS();
+    expect(css).toMatch(/\.harper-msg\s+code\s*\{[^}]*color:\s*var\(--harper-kind-color/);
+    expect(css).toMatch(/\.harper-msg\s+code\s*\{[^}]*background:\s*color-mix/);
+  });
+
+  it('includes shared button and ignore styles', () => {
+    const css = cardContentCSS();
+    expect(css).toContain('.harper-btn');
+    expect(css).toContain('.harper-ignore');
+    expect(css).toContain('.harper-actions');
+  });
+
+  it('includes dark mode overrides for shared elements', () => {
+    const css = cardContentCSS();
+    expect(css).toContain('@media (prefers-color-scheme: dark)');
+    expect(css).toMatch(/\.harper-btn\s*\{[^}]*background:\s*#323639/);
+    expect(css).toMatch(/\.harper-ignore\s*\{[^}]*border-color:\s*#555/);
   });
 });

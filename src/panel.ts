@@ -4,11 +4,8 @@ import { EditorView, ViewPlugin } from '@codemirror/view';
 import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
-import { addToDictionary, shouldAddToDict } from './lint';
-import { kindColors, kindColorsDark } from './styling';
+import { setAccentColor, buildCardContent, ignoreDiagnostic, injectCardCSS } from './card';
 
-const fallback = '#6c757d';
-const fallbackDark = '#B8C0CC';
 const paneWidth = 290;
 
 /** Toggle the review-problems pane open / closed. */
@@ -204,11 +201,8 @@ function renderPane(dom: HTMLElement, view: EditorView) {
     const section = document.createElement('div');
     section.className = 'harper-pane-section';
 
-    // Set accent color on the section for use by heading
-    const color = kindColors[kind] ?? fallback;
-    const darkColor = kindColorsDark[kind] ?? fallbackDark;
-    section.style.setProperty('--harper-kind-color', color);
-    section.style.setProperty('--harper-kind-color-dark', darkColor);
+    // Set accent color on the section for use by heading and card code elements
+    setAccentColor(section, kind);
 
     // Section heading with category badge and accent color
     const heading = document.createElement('div');
@@ -240,67 +234,20 @@ function renderPane(dom: HTMLElement, view: EditorView) {
         card.appendChild(word);
       }
 
-      // Message
-      const msg = document.createElement('div');
-      msg.className = 'harper-pane-msg';
-      msg.innerHTML = diag.messageHtml;
-      card.appendChild(msg);
-
-      // Actions row
-      const actions = document.createElement('div');
-      actions.className = 'harper-pane-actions';
-
-      for (const action of diag.actions) {
-        const btn = document.createElement('button');
-        btn.className = 'harper-pane-btn';
-        btn.textContent = action.name;
-        btn.onmousedown = (e) => e.preventDefault();
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          if (card.classList.contains('harper-pane-item-dismissing')) return;
-
-          const current = view.state.field(diagnosticsField).diagnostics.find(d =>
-            d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
-          );
-          if (!current) return;
-
-          // Apply the fix
-          action.apply(view, current.from, current.to);
-
-          // Animate card dismissal
-          dismissCard(card, dom);
-        };
-        actions.appendChild(btn);
-      }
-
-      // Ignore button — removes this diagnostic (and adds to dictionary if configured)
-      const ignore = document.createElement('button');
-      ignore.className = 'harper-pane-ignore';
-      ignore.textContent = 'Ignore';
-      ignore.onmousedown = (e) => e.preventDefault();
-      ignore.onclick = (e) => {
-        e.stopPropagation();
-        if (card.classList.contains('harper-pane-item-dismissing')) return;
-
-        if (shouldAddToDict && diag.problemText) {
-          void addToDictionary(diag.problemText);
-        }
-        const { diagnostics: currentDiags } = view.state.field(diagnosticsField);
-        const filtered = currentDiags.filter(d =>
-          !(d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind),
-        );
-        view.dispatch({ effects: setDiagnosticsEffect.of(filtered) });
-
-        // Animate card dismissal
-        dismissCard(card, dom);
-      };
-      actions.appendChild(ignore);
-
-      card.appendChild(actions);
+      // Shared card content: message + actions (suggestion buttons + ignore)
+      buildCardContent(card, view, diag, {
+        guard: (container) => !container.classList.contains('harper-pane-item-dismissing'),
+        onApply: (container) => dismissCard(container, dom),
+        onIgnore: (container, d) => {
+          ignoreDiagnostic(view, d);
+          dismissCard(container, dom);
+        },
+      });
 
       // Click to focus the issue in the editor
       card.onclick = () => {
-        const current = view.state.field(diagnosticsField).diagnostics.find(d =>
+        const { diagnostics: currentDiags } = view.state.field(diagnosticsField);
+        const current = currentDiags.find(d =>
           d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
         );
         if (current) {
@@ -559,65 +506,25 @@ export function paneCSS(): string {
   margin-bottom: 3px;
   word-break: break-word;
 }
-.harper-pane-msg {
+.harper-pane-item .harper-msg {
   font-size: 12px;
   color: #555;
-  line-height: 1.5;
 }
-.harper-pane-msg p {
-  margin: 0;
-}
-.harper-pane-msg code {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+.harper-pane-item .harper-msg code {
   font-size: 11px;
   padding: 1px 5px;
-  border-radius: 4px;
-  color: var(--harper-kind-color, #24292f);
-  background: color-mix(in srgb, var(--harper-kind-color, #6c757d) 10%, transparent);
 }
-.harper-pane-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.harper-pane-item .harper-actions {
   margin-top: 8px;
-  align-items: center;
 }
-.harper-pane-btn {
+.harper-pane-item .harper-btn {
   padding: 3px 8px;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background: #f6f8fa;
-  color: #24292f;
-  cursor: pointer;
   font-size: 11px;
-  font-weight: 500;
-  font-family: inherit;
-  line-height: 1.4;
-  transition: background 0.15s, border-color 0.15s;
 }
-.harper-pane-btn:hover {
-  background: #eaeef2;
-  border-color: #afb8c1;
-}
-.harper-pane-btn:active {
-  background: #d8dee4;
-}
-.harper-pane-ignore {
+.harper-pane-item .harper-ignore {
   padding: 3px 8px;
-  border: 1px solid #c0c0c0;
-  border-radius: 6px;
-  background: transparent;
-  color: #555;
-  cursor: pointer;
   font-size: 11px;
-  font-weight: 400;
-  font-family: inherit;
-  line-height: 1.4;
-  margin-left: auto;
-  transition: background 0.15s, border-color 0.15s;
 }
-.harper-pane-ignore:hover { background: rgba(0, 0, 0, 0.05); border-color: #999; }
-.harper-pane-ignore:active { background: rgba(0, 0, 0, 0.08); }
 `;
 
   // Dark mode overrides
@@ -661,28 +568,7 @@ export function paneCSS(): string {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   }
   .harper-pane-word { color: #f0f0f0; }
-  .harper-pane-msg { color: #bbb; }
-  .harper-pane-msg code {
-    color: var(--harper-kind-color-dark, #f0f0f0);
-    background: color-mix(in srgb, var(--harper-kind-color-dark, #B8C0CC) 15%, transparent);
-  }
-  .harper-pane-btn {
-    border-color: #464a4f;
-    background: #323639;
-    color: #e2e4e8;
-  }
-  .harper-pane-btn:hover {
-    background: #3a3e42;
-    border-color: #525659;
-  }
-  .harper-pane-btn:active { background: #42464a; }
-  .harper-pane-ignore {
-    border-color: #555;
-    background: transparent;
-    color: #bbb;
-  }
-  .harper-pane-ignore:hover { background: rgba(255, 255, 255, 0.08); border-color: #666; }
-  .harper-pane-ignore:active { background: rgba(255, 255, 255, 0.12); }
+  .harper-pane-item .harper-msg { color: #bbb; }
 }
 `;
 
@@ -690,6 +576,7 @@ export function paneCSS(): string {
 }
 
 function injectPaneCSS() {
+  injectCardCSS();
   if (document.getElementById('harper-pane-styles')) return;
   const style = document.createElement('style');
   style.id = 'harper-pane-styles';
