@@ -114,7 +114,7 @@ const cardCSS = `
     justify-content: center;
   }
   .harper-card .harper-close:hover { color: #444; }
-  .harper-card .harper-msg { color: #444444; }
+  .harper-card .harper-msg { color: #222222; }
   .harper-card .harper-msg p {
     margin: 0px;
   }
@@ -167,7 +167,7 @@ const cardCSS = `
     }
     .harper-card .harper-close { color: #777; }
     .harper-card .harper-close:hover { color: #bbb; }
-    .harper-card .harper-msg { color: #aaaaaa; }
+    .harper-card .harper-msg { color: #cccccc; }
     .harper-card .harper-msg code {
       color: var(--harper-kind-color-dark, #f0f0f0);
       background: color-mix(in srgb, var(--harper-kind-color-dark, #B8C0CC) 15%, transparent);
@@ -216,6 +216,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   const close = document.createElement('button');
   close.className = 'harper-close';
   close.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
+  close.title = 'Close';
   close.ariaLabel = 'Close';
   close.onmousedown = (e) => e.preventDefault();
   close.onclick = () => {
