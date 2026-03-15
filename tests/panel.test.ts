@@ -1,27 +1,42 @@
 import { describe, expect, it } from 'vitest';
-import { panelCSS } from '../src/panel';
+import { paneCSS } from '../src/panel';
 
-describe('panelCSS', () => {
-  it('includes core panel class rules', () => {
-    const css = panelCSS();
-    expect(css).toContain('.harper-panel {');
-    expect(css).toContain('.harper-panel-header');
-    expect(css).toContain('.harper-panel-body');
-    expect(css).toContain('.harper-panel-item');
-    expect(css).toContain('.harper-panel-close');
-    expect(css).toContain('.harper-panel-action');
+describe('paneCSS', () => {
+  it('includes core pane class rules', () => {
+    const css = paneCSS();
+    expect(css).toContain('.harper-pane {');
+    expect(css).toContain('.harper-pane-header');
+    expect(css).toContain('.harper-pane-body');
+    expect(css).toContain('.harper-pane-item');
+    expect(css).toContain('.harper-pane-close');
+    expect(css).toContain('.harper-pane-action');
+  });
+
+  it('positions the pane as a right sidebar', () => {
+    const css = paneCSS();
+    expect(css).toContain('position: absolute');
+    expect(css).toContain('right: 0');
+    expect(css).toContain('top: 0');
+    expect(css).toContain('bottom: 0');
+  });
+
+  it('makes the body scrollable', () => {
+    const css = paneCSS();
+    expect(css).toContain('.harper-pane-body');
+    expect(css).toContain('overflow-y: auto');
+    expect(css).toContain('min-height: 0');
   });
 
   it('includes dark mode overrides', () => {
-    const css = panelCSS();
+    const css = paneCSS();
     expect(css).toContain('@media (prefers-color-scheme: dark)');
-    expect(css).toContain('.harper-panel-title { color: #ddd; }');
+    expect(css).toContain('.harper-pane-title { color: #ddd; }');
   });
 
   it('includes empty state and section styles', () => {
-    const css = panelCSS();
-    expect(css).toContain('.harper-panel-empty');
-    expect(css).toContain('.harper-panel-section');
-    expect(css).toContain('.harper-panel-count');
+    const css = paneCSS();
+    expect(css).toContain('.harper-pane-empty');
+    expect(css).toContain('.harper-pane-section');
+    expect(css).toContain('.harper-pane-count');
   });
 });

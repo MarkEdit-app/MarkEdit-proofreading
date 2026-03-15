@@ -5,7 +5,7 @@ import { EditorView } from '@codemirror/view';
 import { MarkEdit } from 'markedit-api';
 import { diagnosticsField, setDiagnosticsEffect, lintToDiagnostic } from './decoration';
 import { clickTooltipField, tooltipHandlers } from './tooltip';
-import { panelField } from './panel';
+import { panelExtension } from './panel';
 import { baseTheme, kindCSS } from './styling';
 import { lint } from './lint';
 import { getProofreadingSettings } from './settings';
@@ -58,7 +58,7 @@ const lintScheduler = ViewPlugin.fromClass(class {
 });
 
 export function proofreadingExtension(): Extension {
-  const extensions: Extension[] = [diagnosticsField, clickTooltipField, tooltipHandlers, panelField, baseTheme, kindStyleInjector];
+  const extensions: Extension[] = [diagnosticsField, clickTooltipField, tooltipHandlers, panelExtension, baseTheme, kindStyleInjector];
 
   if (autoLintDelay !== -1) {
     extensions.push(lintScheduler);

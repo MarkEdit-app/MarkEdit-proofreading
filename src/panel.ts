@@ -1,17 +1,19 @@
 import { StateField, StateEffect } from '@codemirror/state';
-import { EditorView, showPanel } from '@codemirror/view';
-import type { Panel } from '@codemirror/view';
+import type { Extension } from '@codemirror/state';
+import { EditorView, ViewPlugin } from '@codemirror/view';
+import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
 import { kindColors, kindColorsDark } from './styling';
 
 const fallback = '#6c757d';
 const fallbackDark = '#9CA3AF';
+const paneWidth = 320;
 
 /** Toggle the review-problems pane open / closed. */
 export const togglePanelEffect = StateEffect.define<boolean>();
 
-export const panelField = StateField.define<boolean>({
+const panelOpenField = StateField.define<boolean>({
   create() {
     return false;
   },
@@ -23,50 +25,105 @@ export const panelField = StateField.define<boolean>({
     }
     return value;
   },
-  provide: f => showPanel.from(f, open => open ? createPanel : null),
 });
 
-function createPanel(view: EditorView): Panel {
-  injectPanelCSS();
+const panelPlugin = ViewPlugin.fromClass(class {
+  private pane: HTMLElement | null = null;
 
-  const dom = document.createElement('div');
-  dom.className = 'harper-panel';
+  constructor(readonly view: EditorView) {
+    this.sync();
+  }
 
-  const render = () => renderPanel(dom, view);
-  render();
+  update(update: ViewUpdate) {
+    const panelToggled = update.transactions.some(tr =>
+      tr.effects.some(e => e.is(togglePanelEffect)),
+    );
 
-  return {
-    dom,
-    update(update) {
-      // Re-render when diagnostics change or panel is toggled
-      for (const effect of update.transactions.flatMap(tr => tr.effects)) {
-        if (effect.is(setDiagnosticsEffect) || effect.is(togglePanelEffect)) {
-          render();
-          return;
-        }
+    if (panelToggled) {
+      this.sync();
+      return;
+    }
+
+    // Re-render content when diagnostics change while open
+    if (this.pane) {
+      const diagChanged = update.transactions.some(tr =>
+        tr.effects.some(e => e.is(setDiagnosticsEffect)),
+      );
+      if (diagChanged) {
+        this.renderContent();
       }
-    },
-    top: false,
-  };
-}
+    }
+  }
 
-function renderPanel(dom: HTMLElement, view: EditorView) {
+  sync() {
+    const open = this.view.state.field(panelOpenField);
+    if (open && !this.pane) {
+      this.open();
+    } else if (!open && this.pane) {
+      this.close();
+    }
+  }
+
+  open() {
+    injectPaneCSS();
+
+    const pane = document.createElement('div');
+    pane.className = 'harper-pane';
+    this.pane = pane;
+
+    this.renderContent();
+
+    // Insert sidebar inside .cm-editor, next to .cm-scroller
+    this.view.dom.appendChild(pane);
+    this.view.dom.classList.add('harper-pane-open');
+  }
+
+  close() {
+    if (this.pane) {
+      this.pane.remove();
+      this.pane = null;
+    }
+    this.view.dom.classList.remove('harper-pane-open');
+  }
+
+  renderContent() {
+    if (!this.pane) return;
+    renderPane(this.pane, this.view);
+  }
+
+  destroy() {
+    this.close();
+  }
+});
+
+const panelTheme = EditorView.baseTheme({
+  '&.harper-pane-open .cm-scroller': {
+    marginRight: `${paneWidth}px`,
+  },
+});
+
+/** All extensions needed for the review-problems pane. */
+export const panelExtension: Extension = [panelOpenField, panelPlugin, panelTheme];
+
+// ─── Rendering ────────────────────────────────────────────────────────────────
+
+function renderPane(dom: HTMLElement, view: EditorView) {
   dom.innerHTML = '';
 
   // Header
   const header = document.createElement('div');
-  header.className = 'harper-panel-header';
+  header.className = 'harper-pane-header';
 
   const title = document.createElement('span');
-  title.className = 'harper-panel-title';
+  title.className = 'harper-pane-title';
   title.textContent = 'Problems';
   header.appendChild(title);
 
   const headerActions = document.createElement('div');
-  headerActions.className = 'harper-panel-header-actions';
+  headerActions.className = 'harper-pane-header-actions';
 
   const ignoreAllBtn = document.createElement('button');
-  ignoreAllBtn.className = 'harper-panel-action';
+  ignoreAllBtn.className = 'harper-pane-action';
   ignoreAllBtn.textContent = 'Ignore All';
   ignoreAllBtn.onclick = () => {
     view.dispatch({ effects: setDiagnosticsEffect.of([]) });
@@ -74,7 +131,7 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
   headerActions.appendChild(ignoreAllBtn);
 
   const closeBtn = document.createElement('button');
-  closeBtn.className = 'harper-panel-close';
+  closeBtn.className = 'harper-pane-close';
   closeBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
   closeBtn.ariaLabel = 'Close';
   closeBtn.onclick = () => {
@@ -87,13 +144,13 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
 
   // Body – scrollable list
   const body = document.createElement('div');
-  body.className = 'harper-panel-body';
+  body.className = 'harper-pane-body';
 
   const { diagnostics } = view.state.field(diagnosticsField);
 
   if (diagnostics.length === 0) {
     const empty = document.createElement('div');
-    empty.className = 'harper-panel-empty';
+    empty.className = 'harper-pane-empty';
     empty.textContent = 'No problems found.';
     body.appendChild(empty);
     dom.appendChild(body);
@@ -105,11 +162,11 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
 
   for (const [kind, items] of groups) {
     const section = document.createElement('div');
-    section.className = 'harper-panel-section';
+    section.className = 'harper-pane-section';
 
     // Section heading with category badge
     const heading = document.createElement('div');
-    heading.className = 'harper-panel-section-heading';
+    heading.className = 'harper-pane-section-heading';
 
     const badge = document.createElement('span');
     badge.className = 'harper-badge';
@@ -118,7 +175,7 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
     heading.appendChild(badge);
 
     const count = document.createElement('span');
-    count.className = 'harper-panel-count';
+    count.className = 'harper-pane-count';
     count.textContent = `${items.length}`;
     heading.appendChild(count);
 
@@ -127,10 +184,10 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
     // Items
     for (const diag of items) {
       const card = document.createElement('div');
-      card.className = 'harper-panel-item';
+      card.className = 'harper-pane-item';
       card.setAttribute('data-lint-kind', kind);
 
-      // Colored left border
+      // Colored left border via CSS custom properties
       const color = kindColors[kind] ?? fallback;
       const darkColor = kindColorsDark[kind] ?? fallbackDark;
       card.style.setProperty('--harper-kind-color', color);
@@ -139,25 +196,25 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
       // Problem text (flagged word)
       if (diag.problemText) {
         const word = document.createElement('span');
-        word.className = 'harper-panel-word';
+        word.className = 'harper-pane-word';
         word.textContent = diag.problemText;
         card.appendChild(word);
       }
 
       // Message
       const msg = document.createElement('div');
-      msg.className = 'harper-panel-msg';
+      msg.className = 'harper-pane-msg';
       msg.innerHTML = diag.messageHtml;
       card.appendChild(msg);
 
       // Actions row
       if (diag.actions.length > 0) {
         const actions = document.createElement('div');
-        actions.className = 'harper-panel-actions';
+        actions.className = 'harper-pane-actions';
 
         for (const action of diag.actions) {
           const btn = document.createElement('button');
-          btn.className = 'harper-panel-btn';
+          btn.className = 'harper-pane-btn';
           btn.textContent = action.name;
           btn.onmousedown = (e) => e.preventDefault();
           btn.onclick = (e) => {
@@ -213,9 +270,14 @@ function groupByKind(diagnostics: Diagnostic[]): [string, Diagnostic[]][] {
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
 
-export function panelCSS(): string {
+export function paneCSS(): string {
   let css = `
-.harper-panel {
+.harper-pane {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: ${paneWidth}px;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
   border-left: 1px solid rgba(0, 0, 0, 0.12);
   background: rgba(255, 255, 255, 0.6);
@@ -223,13 +285,13 @@ export function panelCSS(): string {
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  height: 100%;
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  overflow: hidden;
+  z-index: 5;
+  box-sizing: border-box;
 }
-.harper-panel-header {
+.harper-pane-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -237,18 +299,18 @@ export function panelCSS(): string {
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
-.harper-panel-title {
+.harper-pane-title {
   font-size: 13px;
   font-weight: 600;
   color: #333;
   letter-spacing: 0.1px;
 }
-.harper-panel-header-actions {
+.harper-pane-header-actions {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-.harper-panel-action {
+.harper-pane-action {
   padding: 3px 8px;
   border: 1px solid #d0d7de;
   border-radius: 6px;
@@ -261,14 +323,14 @@ export function panelCSS(): string {
   line-height: 1.4;
   transition: background 0.15s, border-color 0.15s;
 }
-.harper-panel-action:hover {
+.harper-pane-action:hover {
   background: #eaeef2;
   border-color: #afb8c1;
 }
-.harper-panel-action:active {
+.harper-pane-action:active {
   background: #d8dee4;
 }
-.harper-panel-close {
+.harper-pane-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -280,35 +342,36 @@ export function panelCSS(): string {
   border-radius: 4px;
   transition: color 0.15s, background 0.15s;
 }
-.harper-panel-close:hover {
+.harper-pane-close:hover {
   color: #444;
   background: rgba(0, 0, 0, 0.06);
 }
-.harper-panel-close:active {
+.harper-pane-close:active {
   background: rgba(0, 0, 0, 0.1);
 }
-.harper-panel-body {
+.harper-pane-body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 6px 0;
+  min-height: 0;
 }
-.harper-panel-empty {
+.harper-pane-empty {
   padding: 24px 16px;
   text-align: center;
   color: #999;
   font-size: 13px;
 }
-.harper-panel-section {
+.harper-pane-section {
   margin-bottom: 4px;
 }
-.harper-panel-section-heading {
+.harper-pane-section-heading {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 12px 4px;
 }
-.harper-panel-section-heading .harper-badge {
+.harper-pane-section-heading .harper-badge {
   display: inline-block;
   padding: 2px 4px;
   border-radius: 4px;
@@ -316,12 +379,12 @@ export function panelCSS(): string {
   font-weight: 600;
   letter-spacing: 0.2px;
 }
-.harper-panel-count {
+.harper-pane-count {
   font-size: 11px;
   color: #999;
   font-weight: 500;
 }
-.harper-panel-item {
+.harper-pane-item {
   position: relative;
   margin: 2px 8px;
   padding: 8px 10px 8px 14px;
@@ -330,13 +393,13 @@ export function panelCSS(): string {
   border-left: 3px solid var(--harper-kind-color, ${fallback});
   transition: background 0.15s;
 }
-.harper-panel-item:hover {
+.harper-pane-item:hover {
   background: rgba(0, 0, 0, 0.04);
 }
-.harper-panel-item:active {
+.harper-pane-item:active {
   background: rgba(0, 0, 0, 0.07);
 }
-.harper-panel-word {
+.harper-pane-word {
   display: inline-block;
   font-size: 13px;
   font-weight: 600;
@@ -344,28 +407,28 @@ export function panelCSS(): string {
   margin-bottom: 2px;
   word-break: break-word;
 }
-.harper-panel-msg {
+.harper-pane-msg {
   font-size: 12px;
   color: #555;
   line-height: 1.45;
 }
-.harper-panel-msg p {
+.harper-pane-msg p {
   margin: 0;
 }
-.harper-panel-msg code {
+.harper-pane-msg code {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   font-size: 11px;
   padding: 1px 3px;
   border-radius: 3px;
   background: rgba(0, 0, 0, 0.06);
 }
-.harper-panel-actions {
+.harper-pane-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
   margin-top: 5px;
 }
-.harper-panel-btn {
+.harper-pane-btn {
   padding: 2px 6px;
   border: 1px solid #d0d7de;
   border-radius: 5px;
@@ -378,11 +441,11 @@ export function panelCSS(): string {
   line-height: 1.4;
   transition: background 0.15s, border-color 0.15s;
 }
-.harper-panel-btn:hover {
+.harper-pane-btn:hover {
   background: #eaeef2;
   border-color: #afb8c1;
 }
-.harper-panel-btn:active {
+.harper-pane-btn:active {
   background: #d8dee4;
 }
 `;
@@ -390,57 +453,57 @@ export function panelCSS(): string {
   // Dark mode overrides
   css += `
 @media (prefers-color-scheme: dark) {
-  .harper-panel {
+  .harper-pane {
     background: rgba(30, 30, 30, 0.6);
     border-left-color: rgba(255, 255, 255, 0.1);
   }
-  .harper-panel-header {
+  .harper-pane-header {
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
-  .harper-panel-title { color: #ddd; }
-  .harper-panel-action {
+  .harper-pane-title { color: #ddd; }
+  .harper-pane-action {
     border-color: #555;
     background: #3d3d3d;
     color: #e0e0e0;
   }
-  .harper-panel-action:hover {
+  .harper-pane-action:hover {
     background: #4a4a4a;
     border-color: #666;
   }
-  .harper-panel-action:active { background: #555; }
-  .harper-panel-close { color: #777; }
-  .harper-panel-close:hover { color: #bbb; background: rgba(255, 255, 255, 0.08); }
-  .harper-panel-close:active { background: rgba(255, 255, 255, 0.12); }
-  .harper-panel-empty { color: #777; }
-  .harper-panel-count { color: #777; }
-  .harper-panel-item {
+  .harper-pane-action:active { background: #555; }
+  .harper-pane-close { color: #777; }
+  .harper-pane-close:hover { color: #bbb; background: rgba(255, 255, 255, 0.08); }
+  .harper-pane-close:active { background: rgba(255, 255, 255, 0.12); }
+  .harper-pane-empty { color: #777; }
+  .harper-pane-count { color: #777; }
+  .harper-pane-item {
     border-left-color: var(--harper-kind-color-dark, ${fallbackDark});
   }
-  .harper-panel-item:hover { background: rgba(255, 255, 255, 0.05); }
-  .harper-panel-item:active { background: rgba(255, 255, 255, 0.08); }
-  .harper-panel-word { color: #ddd; }
-  .harper-panel-msg { color: #aaa; }
-  .harper-panel-msg code { background: rgba(255, 255, 255, 0.08); }
-  .harper-panel-btn {
+  .harper-pane-item:hover { background: rgba(255, 255, 255, 0.05); }
+  .harper-pane-item:active { background: rgba(255, 255, 255, 0.08); }
+  .harper-pane-word { color: #ddd; }
+  .harper-pane-msg { color: #aaa; }
+  .harper-pane-msg code { background: rgba(255, 255, 255, 0.08); }
+  .harper-pane-btn {
     border-color: #555;
     background: #3d3d3d;
     color: #e0e0e0;
   }
-  .harper-panel-btn:hover {
+  .harper-pane-btn:hover {
     background: #4a4a4a;
     border-color: #666;
   }
-  .harper-panel-btn:active { background: #555; }
+  .harper-pane-btn:active { background: #555; }
 }
 `;
 
   return css;
 }
 
-function injectPanelCSS() {
-  if (document.getElementById('harper-panel-styles')) return;
+function injectPaneCSS() {
+  if (document.getElementById('harper-pane-styles')) return;
   const style = document.createElement('style');
-  style.id = 'harper-panel-styles';
-  style.textContent = panelCSS();
+  style.id = 'harper-pane-styles';
+  style.textContent = paneCSS();
   document.head.appendChild(style);
 }

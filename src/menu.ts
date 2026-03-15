@@ -18,6 +18,7 @@ export function buildMenuItem(): MenuItem {
         title: 'Review Problems',
         action: reviewProblems,
       },
+      { separator: true },
       {
         title: 'Ignore All',
         action: ignoreAll,
