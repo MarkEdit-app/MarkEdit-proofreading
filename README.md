@@ -42,4 +42,4 @@ https://writewithharper.com/docs/rules
 
 ## Dictionary
 
-When `addToDict` is enabled (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary persisted in `proofreading-dict.txt` under the MarkEdit documents directory. Dictionary words are automatically loaded when the extension starts.
+When `addToDict` is enabled (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary persisted at `~/Library/Containers/app.cyan.markedit/Data/Documents/proofreading-dict.txt`. Dictionary words are automatically loaded when the extension starts.
