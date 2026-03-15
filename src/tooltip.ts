@@ -6,7 +6,7 @@ import { addToDictionary, shouldAddToDict } from './lint';
 import { kindColors, kindColorsDark } from './styling';
 import type { Diagnostic } from './decoration';
 
-const setClickTooltip = StateEffect.define<Diagnostic | null>();
+export const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
 export const clickTooltipField = StateField.define<Tooltip | null>({
   create() {

@@ -3,6 +3,7 @@ import type { MenuItem } from 'markedit-api';
 import { setDiagnosticsEffect, lintToDiagnostic } from './decoration';
 import { lint, resetDictionary } from './lint';
 import { togglePanelEffect } from './panel';
+import { setClickTooltip } from './tooltip';
 import { repoUrl } from './const';
 
 export function buildMenuItem(): MenuItem {
@@ -60,6 +61,7 @@ async function reviewProblems() {
   const lints = await lint(text);
   view.dispatch({
     effects: [
+      setClickTooltip.of(null),
       setDiagnosticsEffect.of(lints.map(lintToDiagnostic)),
       togglePanelEffect.of(true),
     ],
