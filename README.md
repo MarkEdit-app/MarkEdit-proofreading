@@ -51,3 +51,29 @@ https://writewithharper.com/docs/rules
 ## Dictionary
 
 When `addToDict` is enabled (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary persisted at `~/Library/Containers/app.cyan.markedit/Data/Documents/proofreading-dict.txt`. Dictionary words are automatically loaded when the extension starts.
+
+## Development
+
+Install dependencies:
+
+```sh
+yarn install
+```
+
+Lint the codebase with [ESLint](https://eslint.org/):
+
+```sh
+yarn lint
+```
+
+Run the test suite with [Vitest](https://vitest.dev/):
+
+```sh
+yarn test
+```
+
+Build the extension (runs lint, tests, then [Vite](https://vite.dev/)):
+
+```sh
+yarn build
+```
