@@ -70,7 +70,7 @@ describe('paneCSS', () => {
   it('includes dark mode overrides', () => {
     const css = paneCSS();
     expect(css).toContain('@media (prefers-color-scheme: dark)');
-    expect(css).toContain('.harper-pane-title { color: #e0e0e0; }');
+    expect(css).toContain('.harper-pane-title { color: #f0f0f0; }');
   });
 
   it('includes empty state and section styles', () => {

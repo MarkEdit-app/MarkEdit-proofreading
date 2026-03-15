@@ -7,7 +7,7 @@ import type { Diagnostic } from './decoration';
 import { kindColors, kindColorsDark } from './styling';
 
 const fallback = '#6c757d';
-const fallbackDark = '#9CA3AF';
+const fallbackDark = '#B8C0CC';
 const paneWidth = 290;
 
 /** Toggle the review-problems pane open / closed. */
@@ -501,23 +501,23 @@ export function paneCSS(): string {
   .harper-pane-header {
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
-  .harper-pane-title { color: #e0e0e0; }
-  .harper-pane-total { color: #777; }
+  .harper-pane-title { color: #f0f0f0; }
+  .harper-pane-total { color: #999; }
   .harper-pane-action {
-    border-color: #555;
-    background: #3d3d3d;
-    color: #e0e0e0;
+    border-color: #666;
+    background: #444;
+    color: #f0f0f0;
   }
   .harper-pane-action:hover {
-    background: #4a4a4a;
-    border-color: #666;
+    background: #555;
+    border-color: #777;
   }
-  .harper-pane-action:active { background: #555; }
-  .harper-pane-close { color: #777; }
-  .harper-pane-close:hover { color: #bbb; background: rgba(255, 255, 255, 0.08); }
-  .harper-pane-close:active { background: rgba(255, 255, 255, 0.12); }
-  .harper-pane-empty { color: #777; }
-  .harper-pane-count { color: #777; }
+  .harper-pane-action:active { background: #666; }
+  .harper-pane-close { color: #999; }
+  .harper-pane-close:hover { color: #ddd; background: rgba(255, 255, 255, 0.1); }
+  .harper-pane-close:active { background: rgba(255, 255, 255, 0.15); }
+  .harper-pane-empty { color: #999; }
+  .harper-pane-count { color: #999; }
   .harper-pane-item {
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
@@ -531,22 +531,22 @@ export function paneCSS(): string {
     background: rgba(255, 255, 255, 0.06);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   }
-  .harper-pane-word { color: #e0e0e0; }
-  .harper-pane-msg { color: #aaa; }
+  .harper-pane-word { color: #f0f0f0; }
+  .harper-pane-msg { color: #bbb; }
   .harper-pane-msg code {
-    color: var(--harper-kind-color-dark, #e0e0e0);
-    background: color-mix(in srgb, var(--harper-kind-color-dark, #9CA3AF) 12%, transparent);
+    color: var(--harper-kind-color-dark, #f0f0f0);
+    background: color-mix(in srgb, var(--harper-kind-color-dark, #9CA3AF) 15%, transparent);
   }
   .harper-pane-btn {
-    border-color: #555;
-    background: #3d3d3d;
-    color: #e0e0e0;
+    border-color: #666;
+    background: #444;
+    color: #f0f0f0;
   }
   .harper-pane-btn:hover {
-    background: #4a4a4a;
-    border-color: #666;
+    background: #555;
+    border-color: #777;
   }
-  .harper-pane-btn:active { background: #555; }
+  .harper-pane-btn:active { background: #666; }
 }
 `;
 

@@ -54,6 +54,14 @@ function ignoreAll() {
   MarkEdit.editorView.dispatch({ effects: setDiagnosticsEffect.of([]) });
 }
 
-function reviewProblems() {
-  MarkEdit.editorView.dispatch({ effects: togglePanelEffect.of(true) });
+async function reviewProblems() {
+  const view = MarkEdit.editorView;
+  const text = view.state.doc.toString();
+  const lints = await lint(text);
+  view.dispatch({
+    effects: [
+      setDiagnosticsEffect.of(lints.map(lintToDiagnostic)),
+      togglePanelEffect.of(true),
+    ],
+  });
 }
