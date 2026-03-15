@@ -514,6 +514,7 @@ export function paneCSS(): string {
 .harper-pane-item .harper-actions {
   margin-top: 8px;
   flex-wrap: nowrap;
+  overflow: hidden;
 }
 .harper-pane-item .harper-btn {
   padding: 3px 8px;
