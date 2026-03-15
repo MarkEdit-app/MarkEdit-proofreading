@@ -27,6 +27,18 @@ describe('paneCSS', () => {
     expect(css).toContain('min-height: 0');
   });
 
+  it('applies accent color to section heading', () => {
+    const css = paneCSS();
+    expect(css).toContain('.harper-pane-section-heading');
+    expect(css).toMatch(/\.harper-pane-section-heading\s*\{[^}]*border-left:/);
+  });
+
+  it('adds border and spacing to cards', () => {
+    const css = paneCSS();
+    expect(css).toMatch(/\.harper-pane-item\s*\{[^}]*border:\s*1px solid/);
+    expect(css).toMatch(/\.harper-pane-item\s*\{[^}]*margin:\s*6px/);
+  });
+
   it('includes dark mode overrides', () => {
     const css = paneCSS();
     expect(css).toContain('@media (prefers-color-scheme: dark)');

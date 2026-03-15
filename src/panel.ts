@@ -76,6 +76,7 @@ const panelPlugin = ViewPlugin.fromClass(class {
     // Insert sidebar inside .cm-editor, next to .cm-scroller
     this.view.dom.appendChild(pane);
     this.view.dom.classList.add('harper-pane-open');
+    this.view.scrollDOM.style.marginRight = `${paneWidth}px`;
   }
 
   close() {
@@ -84,6 +85,7 @@ const panelPlugin = ViewPlugin.fromClass(class {
       this.pane = null;
     }
     this.view.dom.classList.remove('harper-pane-open');
+    this.view.scrollDOM.style.marginRight = '';
   }
 
   renderContent() {
@@ -96,14 +98,8 @@ const panelPlugin = ViewPlugin.fromClass(class {
   }
 });
 
-const panelTheme = EditorView.baseTheme({
-  '&.harper-pane-open .cm-scroller': {
-    marginRight: `${paneWidth}px`,
-  },
-});
-
 /** All extensions needed for the review-problems pane. */
-export const panelExtension: Extension = [panelOpenField, panelPlugin, panelTheme];
+export const panelExtension: Extension = [panelOpenField, panelPlugin];
 
 // ─── Rendering ────────────────────────────────────────────────────────────────
 
@@ -164,7 +160,13 @@ function renderPane(dom: HTMLElement, view: EditorView) {
     const section = document.createElement('div');
     section.className = 'harper-pane-section';
 
-    // Section heading with category badge
+    // Set accent color on the section for use by heading
+    const color = kindColors[kind] ?? fallback;
+    const darkColor = kindColorsDark[kind] ?? fallbackDark;
+    section.style.setProperty('--harper-kind-color', color);
+    section.style.setProperty('--harper-kind-color-dark', darkColor);
+
+    // Section heading with category badge and accent color
     const heading = document.createElement('div');
     heading.className = 'harper-pane-section-heading';
 
@@ -185,13 +187,6 @@ function renderPane(dom: HTMLElement, view: EditorView) {
     for (const diag of items) {
       const card = document.createElement('div');
       card.className = 'harper-pane-item';
-      card.setAttribute('data-lint-kind', kind);
-
-      // Colored left border via CSS custom properties
-      const color = kindColors[kind] ?? fallback;
-      const darkColor = kindColorsDark[kind] ?? fallbackDark;
-      card.style.setProperty('--harper-kind-color', color);
-      card.style.setProperty('--harper-kind-color-dark', darkColor);
 
       // Problem text (flagged word)
       if (diag.problemText) {
@@ -288,7 +283,7 @@ export function paneCSS(): string {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
-  z-index: 5;
+  z-index: 1;
   box-sizing: border-box;
 }
 .harper-pane-header {
@@ -363,13 +358,15 @@ export function paneCSS(): string {
   font-size: 13px;
 }
 .harper-pane-section {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 .harper-pane-section-heading {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px 4px;
+  padding: 6px 12px 6px 9px;
+  margin: 0 8px;
+  border-left: 3px solid var(--harper-kind-color, ${fallback});
 }
 .harper-pane-section-heading .harper-badge {
   display: inline-block;
@@ -386,18 +383,19 @@ export function paneCSS(): string {
 }
 .harper-pane-item {
   position: relative;
-  margin: 2px 8px;
-  padding: 8px 10px 8px 14px;
+  margin: 6px 8px;
+  padding: 8px 10px;
   border-radius: 6px;
   cursor: pointer;
-  border-left: 3px solid var(--harper-kind-color, ${fallback});
-  transition: background 0.15s;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: background 0.15s, border-color 0.15s;
 }
 .harper-pane-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.18);
 }
 .harper-pane-item:active {
-  background: rgba(0, 0, 0, 0.07);
+  background: rgba(0, 0, 0, 0.06);
 }
 .harper-pane-word {
   display: inline-block;
@@ -476,10 +474,16 @@ export function paneCSS(): string {
   .harper-pane-close:active { background: rgba(255, 255, 255, 0.12); }
   .harper-pane-empty { color: #777; }
   .harper-pane-count { color: #777; }
-  .harper-pane-item {
+  .harper-pane-section-heading {
     border-left-color: var(--harper-kind-color-dark, ${fallbackDark});
   }
-  .harper-pane-item:hover { background: rgba(255, 255, 255, 0.05); }
+  .harper-pane-item {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .harper-pane-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
   .harper-pane-item:active { background: rgba(255, 255, 255, 0.08); }
   .harper-pane-word { color: #ddd; }
   .harper-pane-msg { color: #aaa; }
