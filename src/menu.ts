@@ -27,8 +27,16 @@ export function buildMenuItem(): MenuItem {
       {
         title: 'Reset Dictionary',
         action: async() => {
-          await resetDictionary();
-          await proofreadNow();
+          const button = await MarkEdit.showAlert({
+            title: 'Are you sure you want to reset the dictionary?',
+            message: 'All custom words you have added will be removed. This action cannot be undone.',
+            buttons: ['Reset', 'Cancel'],
+          });
+
+          if (button === 0) {
+            await resetDictionary();
+            await proofreadNow();
+          }
         },
       },
       { separator: true },
