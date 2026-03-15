@@ -2,6 +2,14 @@
 
 [MarkEdit](https://github.com/MarkEdit-app/MarkEdit) grammar checker based on [Harper](https://writewithharper.com/).
 
+## Installation
+
+Since this extension is very big, install it by downloading `markedit-proofreading.js` from the [latest release](https://github.com/MarkEdit-app/MarkEdit-proofreading/releases/latest) and copying it to:
+
+`~/Library/Containers/app.cyan.markedit/Data/Documents/scripts`
+
+Restart MarkEdit after copying the file.
+
 ## Configuration
 
 This extension provides three presets to control how aggressively Harper checks your writing. Presets disable specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules) and filter by lint kind as a safety net:
