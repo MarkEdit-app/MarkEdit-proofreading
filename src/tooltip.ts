@@ -76,7 +76,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
 
 // Tooltip-specific CSS — container, backdrop, close button, and size overrides
 // for the shared `.harper-msg`, `.harper-btn`, `.harper-ignore` base styles.
-const tooltipCSS = `
+export const tooltipCSS = `
   .harper-card {
     position: relative;
     border-radius: 10px;
@@ -115,6 +115,10 @@ const tooltipCSS = `
     justify-content: center;
   }
   .harper-card .harper-close:hover { color: #444; }
+  .harper-card .harper-content {
+    position: relative;
+    padding: 12px;
+  }
   .harper-card .harper-msg { color: #222222; font-size: 13px; margin: 8px 0 25px; }
   .harper-card .harper-msg code { font-size: 12px; padding: 1px 4px; }
   .harper-card .harper-btn { padding: 2px 6px; font-size: 12px; }
@@ -145,13 +149,16 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   }
 
   const dom = document.createElement('div');
-  dom.className = 'harper-card';
-  setAccentColor(dom, diagnostic.lintKind);
+  dom.className = 'harper-tooltip-wrap';
+
+  const card = document.createElement('div');
+  card.className = 'harper-card';
+  setAccentColor(card, diagnostic.lintKind);
 
   // Background layer for translucent blended color
   const bg = document.createElement('div');
   bg.className = 'harper-bg';
-  dom.appendChild(bg);
+  card.appendChild(bg);
 
   // Close button at card level (top-right corner)
   const close = document.createElement('button');
@@ -163,10 +170,10 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   close.onclick = () => {
     view.dispatch({ effects: setClickTooltip.of(null) });
   };
-  dom.appendChild(close);
+  card.appendChild(close);
 
   const content = document.createElement('div');
-  content.style.cssText = 'position: relative; padding: 12px;';
+  content.className = 'harper-content';
 
   // Header: badge only
   const badge = document.createElement('span');
@@ -190,7 +197,8 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     },
   });
 
-  dom.appendChild(content);
+  card.appendChild(content);
+  dom.appendChild(card);
 
   return {
     dom,
@@ -200,7 +208,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       if (wrapper) {
         wrapper.style.background = 'transparent';
         wrapper.style.border = 'none';
-        wrapper.style.padding = '0';
+        wrapper.style.padding = '0 12px 0 0';
         wrapper.style.width = 'max-content';
       }
     },
