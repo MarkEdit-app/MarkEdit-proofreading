@@ -48,8 +48,8 @@ export const kindColorsDark: Record<string, string> = {
   WordChoice: '#6AEE9A',
 };
 
-const fallback = '#6c757d';
-const fallbackDark = '#B8C0CC';
+export const fallback = '#6c757d';
+export const fallbackDark = '#B8C0CC';
 
 export function kindCSS(): string {
   let css = '';

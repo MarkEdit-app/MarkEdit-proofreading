@@ -4,7 +4,7 @@ import { EditorView, ViewPlugin } from '@codemirror/view';
 import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
-import { setAccentColor, buildCardContent, injectCardCSS } from './card';
+import { setAccentColor, findDiagnostic, buildCardContent, injectCardCSS } from './card';
 
 const paneWidth = 290;
 
@@ -238,15 +238,12 @@ function renderPane(dom: HTMLElement, view: EditorView) {
       buildCardContent(card, view, diag, {
         showIgnore: false,
         guard: (container) => !container.classList.contains('harper-pane-item-dismissing'),
-        onApply: (container) => dismissCard(container, dom),
+        onApply: (container) => dismissCard(container, dom, view),
       });
 
       // Click to focus the issue in the editor
       card.onclick = () => {
-        const { diagnostics: currentDiags } = view.state.field(diagnosticsField);
-        const current = currentDiags.find(d =>
-          d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
-        );
+        const current = findDiagnostic(view, diag);
         if (current) {
           view.dispatch({
             selection: { anchor: current.from, head: current.to },
@@ -279,7 +276,7 @@ function groupByKind(diagnostics: Diagnostic[]): [string, Diagnostic[]][] {
 }
 
 /** Animate a card out of the pane after a suggestion is accepted. */
-function dismissCard(card: HTMLElement, paneRoot: HTMLElement) {
+function dismissCard(card: HTMLElement, paneRoot: HTMLElement, view: EditorView) {
   // Lock current height so CSS can transition to 0
   card.style.maxHeight = `${card.offsetHeight}px`;
   void card.offsetHeight; // force reflow
@@ -311,16 +308,9 @@ function dismissCard(card: HTMLElement, paneRoot: HTMLElement) {
       totalEl.textContent = `${remainingTotal}`;
     }
 
-    // Show empty state if no items remain
+    // Auto-close pane when all problems are resolved
     if (remainingTotal === 0) {
-      const body = paneRoot.querySelector('.harper-pane-body');
-      if (body) {
-        body.innerHTML = '';
-        const empty = document.createElement('div');
-        empty.className = 'harper-pane-empty';
-        empty.textContent = 'No problems found.';
-        body.appendChild(empty);
-      }
+      view.dispatch({ effects: togglePanelEffect.of(false) });
     }
   };
 

@@ -13,10 +13,7 @@ import { EditorView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
 import { addToDictionary, shouldAddToDict } from './lint';
-import { kindColors, kindColorsDark } from './styling';
-
-const fallback = '#6c757d';
-const fallbackDark = '#B8C0CC';
+import { kindColors, kindColorsDark, fallback, fallbackDark } from './styling';
 
 /** Set `--harper-kind-color` / `--harper-kind-color-dark` CSS custom properties on an element. */
 export function setAccentColor(el: HTMLElement, lintKind: string) {
