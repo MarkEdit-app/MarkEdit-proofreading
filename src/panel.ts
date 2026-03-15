@@ -356,7 +356,7 @@ export function paneCSS(): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
@@ -374,7 +374,7 @@ export function paneCSS(): string {
 .harper-pane-total {
   font-size: 12px;
   font-weight: 500;
-  color: #888;
+  color: #999;
 }
 .harper-pane-header-actions {
   display: flex;
@@ -382,24 +382,24 @@ export function paneCSS(): string {
   gap: 8px;
 }
 .harper-pane-action {
-  padding: 4px 10px;
-  border: 1px solid #d0d7de;
+  padding: 4px 8px;
+  border: none;
   border-radius: 6px;
-  background: #f6f8fa;
-  color: #24292f;
+  background: transparent;
+  color: #666;
   cursor: pointer;
   font-size: 11px;
   font-weight: 500;
   font-family: inherit;
   line-height: 1.4;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 .harper-pane-action:hover {
-  background: #eaeef2;
-  border-color: #afb8c1;
+  background: rgba(0, 0, 0, 0.06);
+  color: #333;
 }
 .harper-pane-action:active {
-  background: #d8dee4;
+  background: rgba(0, 0, 0, 0.1);
 }
 .harper-pane-close {
   display: flex;
@@ -524,17 +524,15 @@ export function paneCSS(): string {
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
   .harper-pane-title { color: #f0f0f0; }
-  .harper-pane-total { color: #999; }
+  .harper-pane-total { color: #888; }
   .harper-pane-action {
-    border-color: #464a4f;
-    background: #323639;
-    color: #e2e4e8;
+    color: #888;
   }
   .harper-pane-action:hover {
-    background: #3a3e42;
-    border-color: #525659;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ccc;
   }
-  .harper-pane-action:active { background: #42464a; }
+  .harper-pane-action:active { background: rgba(255, 255, 255, 0.12); }
   .harper-pane-close { color: #999; }
   .harper-pane-close:hover { color: #ddd; background: rgba(255, 255, 255, 0.1); }
   .harper-pane-close:active { background: rgba(255, 255, 255, 0.15); }
