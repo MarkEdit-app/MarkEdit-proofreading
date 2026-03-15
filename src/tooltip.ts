@@ -168,13 +168,13 @@ const cardCSS = `
     .harper-card .harper-msg { color: #aaaaaa; }
     .harper-card .harper-msg code { background: rgba(255, 255, 255, 0.08); }
     .harper-card .harper-btn {
-      border-color: #4d5562;
-      background: #363d48;
-      color: #e4e8ee;
+      border-color: #464a4f;
+      background: #323639;
+      color: #e2e4e8;
     }
     .harper-card .harper-btn:hover {
-      background: #3f4752;
-      border-color: #5a6370;
+      background: #3a3e42;
+      border-color: #525659;
     }
     .harper-card .harper-ignore {
       border-color: #555;
