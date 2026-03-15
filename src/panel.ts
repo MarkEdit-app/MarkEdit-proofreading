@@ -535,7 +535,7 @@ export function paneCSS(): string {
   .harper-pane-msg { color: #bbb; }
   .harper-pane-msg code {
     color: var(--harper-kind-color-dark, #f0f0f0);
-    background: color-mix(in srgb, var(--harper-kind-color-dark, #9CA3AF) 15%, transparent);
+    background: color-mix(in srgb, var(--harper-kind-color-dark, #B8C0CC) 15%, transparent);
   }
   .harper-pane-btn {
     border-color: #666;
