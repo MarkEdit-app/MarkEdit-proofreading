@@ -504,15 +504,15 @@ export function paneCSS(): string {
   .harper-pane-title { color: #f0f0f0; }
   .harper-pane-total { color: #999; }
   .harper-pane-action {
-    border-color: #4a5568;
-    background: #2d3748;
-    color: #e8ecf2;
+    border-color: #4d5562;
+    background: #363d48;
+    color: #e4e8ee;
   }
   .harper-pane-action:hover {
-    background: #3a4a5e;
-    border-color: #5a6a80;
+    background: #3f4752;
+    border-color: #5a6370;
   }
-  .harper-pane-action:active { background: #475a72; }
+  .harper-pane-action:active { background: #48505b; }
   .harper-pane-close { color: #999; }
   .harper-pane-close:hover { color: #ddd; background: rgba(255, 255, 255, 0.1); }
   .harper-pane-close:active { background: rgba(255, 255, 255, 0.15); }
@@ -538,15 +538,15 @@ export function paneCSS(): string {
     background: color-mix(in srgb, var(--harper-kind-color-dark, #B8C0CC) 15%, transparent);
   }
   .harper-pane-btn {
-    border-color: #4a5568;
-    background: #2d3748;
-    color: #e8ecf2;
+    border-color: #4d5562;
+    background: #363d48;
+    color: #e4e8ee;
   }
   .harper-pane-btn:hover {
-    background: #3a4a5e;
-    border-color: #5a6a80;
+    background: #3f4752;
+    border-color: #5a6370;
   }
-  .harper-pane-btn:active { background: #475a72; }
+  .harper-pane-btn:active { background: #48505b; }
 }
 `;
 
