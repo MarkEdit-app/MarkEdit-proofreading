@@ -76,7 +76,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
 
 // Tooltip-specific CSS — container, backdrop, close button, and size overrides
 // for the shared `.harper-msg`, `.harper-btn`, `.harper-ignore` base styles.
-export const tooltipCSS = () => `
+export const tooltipCSS = `
   .harper-card {
     position: relative;
     border-radius: 10px;
@@ -119,6 +119,10 @@ export const tooltipCSS = () => `
     position: relative;
     padding-right: 10px;
   }
+  .harper-card .harper-content {
+    position: relative;
+    padding: 12px;
+  }
   .harper-card .harper-msg { color: #222222; font-size: 13px; margin: 8px 0 25px; }
   .harper-card .harper-msg code { font-size: 12px; padding: 1px 4px; }
   .harper-card .harper-btn { padding: 2px 6px; font-size: 12px; }
@@ -144,7 +148,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   if (!document.getElementById('harper-tooltip-styles')) {
     const style = document.createElement('style');
     style.id = 'harper-tooltip-styles';
-    style.textContent = tooltipCSS();
+    style.textContent = tooltipCSS;
     document.head.appendChild(style);
   }
 
@@ -173,7 +177,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   inner.className = 'harper-inner';
 
   const content = document.createElement('div');
-  content.style.cssText = 'position: relative; padding: 12px;';
+  content.className = 'harper-content';
 
   // Header: badge only
   const badge = document.createElement('span');
