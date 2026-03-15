@@ -67,6 +67,14 @@ describe('paneCSS', () => {
     expect(css).toContain('translateX(0)');
   });
 
+  it('includes card dismiss animation styles', () => {
+    const css = paneCSS();
+    expect(css).toContain('.harper-pane-item-dismissing');
+    expect(css).toMatch(/\.harper-pane-item-dismissing\s*\{[^}]*opacity:\s*0/);
+    expect(css).toMatch(/\.harper-pane-item-dismissing\s*\{[^}]*max-height:\s*0/);
+    expect(css).toMatch(/\.harper-pane-item-dismissing\s*\{[^}]*transition:/);
+  });
+
   it('includes dark mode overrides', () => {
     const css = paneCSS();
     expect(css).toContain('@media (prefers-color-scheme: dark)');

@@ -257,12 +257,18 @@ function renderPane(dom: HTMLElement, view: EditorView) {
           btn.onmousedown = (e) => e.preventDefault();
           btn.onclick = (e) => {
             e.stopPropagation();
+            if (card.classList.contains('harper-pane-item-dismissing')) return;
+
             const current = view.state.field(diagnosticsField).diagnostics.find(d =>
               d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
             );
-            if (current) {
-              action.apply(view, current.from, current.to);
-            }
+            if (!current) return;
+
+            // Apply the fix
+            action.apply(view, current.from, current.to);
+
+            // Animate card dismissal
+            dismissCard(card, dom);
           };
           actions.appendChild(btn);
         }
@@ -304,6 +310,60 @@ function groupByKind(diagnostics: Diagnostic[]): [string, Diagnostic[]][] {
     }
   }
   return [...map.entries()];
+}
+
+/** Animate a card out of the pane after a suggestion is accepted. */
+function dismissCard(card: HTMLElement, paneRoot: HTMLElement) {
+  // Lock current height so CSS can transition to 0
+  card.style.maxHeight = `${card.offsetHeight}px`;
+  void card.offsetHeight; // force reflow
+  card.classList.add('harper-pane-item-dismissing');
+
+  let cleaned = false;
+  const cleanup = () => {
+    if (cleaned) return;
+    cleaned = true;
+
+    const section = card.closest('.harper-pane-section');
+    card.remove();
+
+    // Update or remove section
+    if (section) {
+      const remaining = section.querySelectorAll('.harper-pane-item').length;
+      if (remaining === 0) {
+        section.remove();
+      } else {
+        const countEl = section.querySelector('.harper-pane-count');
+        if (countEl) countEl.textContent = `${remaining}`;
+      }
+    }
+
+    // Update total count
+    const totalEl = paneRoot.querySelector('.harper-pane-total');
+    if (totalEl) {
+      totalEl.textContent = `${paneRoot.querySelectorAll('.harper-pane-item').length}`;
+    }
+
+    // Show empty state if no items remain
+    if (paneRoot.querySelectorAll('.harper-pane-item').length === 0) {
+      const body = paneRoot.querySelector('.harper-pane-body');
+      if (body) {
+        body.innerHTML = '';
+        const empty = document.createElement('div');
+        empty.className = 'harper-pane-empty';
+        empty.textContent = 'No problems found.';
+        body.appendChild(empty);
+      }
+    }
+  };
+
+  card.addEventListener('transitionend', function onEnd(evt: TransitionEvent) {
+    if (evt.target !== card) return;
+    card.removeEventListener('transitionend', onEnd);
+    cleanup();
+  });
+  // Safety fallback
+  setTimeout(() => { if (card.parentNode) cleanup(); }, 300);
 }
 
 // ─── CSS ──────────────────────────────────────────────────────────────────────
@@ -455,6 +515,18 @@ export function paneCSS(): string {
 .harper-pane-item:active {
   background: rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.harper-pane-item-dismissing {
+  opacity: 0;
+  max-height: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden;
+  transition: opacity 0.15s ease-out, max-height 0.2s ease-out 0.05s, margin 0.2s ease-out 0.05s, padding 0.2s ease-out 0.05s, border-color 0.15s ease-out, box-shadow 0.15s ease-out;
 }
 .harper-pane-word {
   display: inline-block;
