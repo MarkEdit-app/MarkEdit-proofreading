@@ -163,7 +163,7 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
           btn.onclick = (e) => {
             e.stopPropagation();
             const current = view.state.field(diagnosticsField).diagnostics.find(d =>
-              d.from === diag.from && d.to === diag.to,
+              d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
             );
             if (current) {
               action.apply(view, current.from, current.to);
@@ -178,7 +178,7 @@ function renderPanel(dom: HTMLElement, view: EditorView) {
       // Click to focus the issue in the editor
       card.onclick = () => {
         const current = view.state.field(diagnosticsField).diagnostics.find(d =>
-          d.from === diag.from && d.to === diag.to,
+          d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
         );
         if (current) {
           view.dispatch({
