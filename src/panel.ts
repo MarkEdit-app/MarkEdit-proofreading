@@ -76,16 +76,32 @@ const panelPlugin = ViewPlugin.fromClass(class {
     // Insert sidebar inside .cm-editor, next to .cm-scroller
     this.view.dom.appendChild(pane);
     this.view.dom.classList.add('harper-pane-open');
-    this.view.scrollDOM.style.marginRight = `${paneWidth}px`;
+
+    // Animate margin and pane slide-in on next frame
+    this.view.scrollDOM.style.transition = 'margin-right 0.2s ease-out';
+    requestAnimationFrame(() => {
+      pane.classList.add('harper-pane-visible');
+      this.view.scrollDOM.style.marginRight = `${paneWidth}px`;
+    });
   }
 
   close() {
     if (this.pane) {
-      this.pane.remove();
+      this.pane.classList.remove('harper-pane-visible');
+      this.view.scrollDOM.style.marginRight = '';
+
+      // Remove DOM after the transition ends
+      const pane = this.pane;
       this.pane = null;
+      const onEnd = () => {
+        pane.removeEventListener('transitionend', onEnd);
+        pane.remove();
+      };
+      pane.addEventListener('transitionend', onEnd);
+      // Safety fallback in case transitionend doesn't fire
+      setTimeout(() => { if (pane.parentNode) pane.remove(); }, 250);
     }
     this.view.dom.classList.remove('harper-pane-open');
-    this.view.scrollDOM.style.marginRight = '';
   }
 
   renderContent() {
@@ -295,12 +311,17 @@ export function paneCSS(): string {
   -webkit-touch-callout: none;
   z-index: 1;
   box-sizing: border-box;
+  transform: translateX(100%);
+  transition: transform 0.2s ease-out;
+}
+.harper-pane.harper-pane-visible {
+  transform: translateX(0);
 }
 .harper-pane-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: 10px 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
@@ -437,9 +458,10 @@ export function paneCSS(): string {
 .harper-pane-msg code {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   font-size: 11px;
-  padding: 1px 4px;
+  padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.06);
+  color: var(--harper-kind-color, #24292f);
+  background: color-mix(in srgb, var(--harper-kind-color, #6c757d) 10%, transparent);
 }
 .harper-pane-actions {
   display: flex;
@@ -511,7 +533,10 @@ export function paneCSS(): string {
   }
   .harper-pane-word { color: #e0e0e0; }
   .harper-pane-msg { color: #aaa; }
-  .harper-pane-msg code { background: rgba(255, 255, 255, 0.08); }
+  .harper-pane-msg code {
+    color: var(--harper-kind-color-dark, #e0e0e0);
+    background: color-mix(in srgb, var(--harper-kind-color-dark, #9CA3AF) 12%, transparent);
+  }
   .harper-pane-btn {
     border-color: #555;
     background: #3d3d3d;

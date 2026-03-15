@@ -53,6 +53,20 @@ describe('paneCSS', () => {
     expect(css).toMatch(/\.harper-pane-section-heading\s+\.harper-badge\s*\{[^}]*padding:\s*3px\s+8px/);
   });
 
+  it('styles code elements with accent color', () => {
+    const css = paneCSS();
+    expect(css).toMatch(/\.harper-pane-msg\s+code\s*\{[^}]*color:\s*var\(--harper-kind-color/);
+    expect(css).toMatch(/\.harper-pane-msg\s+code\s*\{[^}]*background:\s*color-mix/);
+  });
+
+  it('includes slide animation styles', () => {
+    const css = paneCSS();
+    expect(css).toMatch(/\.harper-pane\s*\{[^}]*transform:\s*translateX\(100%\)/);
+    expect(css).toMatch(/\.harper-pane\s*\{[^}]*transition:/);
+    expect(css).toContain('.harper-pane-visible');
+    expect(css).toContain('translateX(0)');
+  });
+
   it('includes dark mode overrides', () => {
     const css = paneCSS();
     expect(css).toContain('@media (prefers-color-scheme: dark)');
