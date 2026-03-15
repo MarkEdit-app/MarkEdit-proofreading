@@ -2,7 +2,7 @@
  * Shared card content helpers for both the popup tooltip and the sidebar pane.
  *
  * Both UIs present a diagnostic card with the same inner structure:
- *   message HTML → action buttons → ignore button
+ *   message HTML → action buttons (→ optional ignore button)
  *
  * This module provides the DOM-building logic, diagnostic lookup helpers,
  * and shared base CSS so neither consumer duplicates the card internals.
@@ -50,11 +50,13 @@ export interface CardCallbacks {
   onApply?: (container: HTMLElement) => void;
   /** Called when "Ignore" is clicked. */
   onIgnore?: (container: HTMLElement, diag: Diagnostic) => void;
+  /** Whether to show the "Ignore" button (default: true). */
+  showIgnore?: boolean;
 }
 
 /**
  * Build the inner content of a diagnostic card:
- * message HTML + actions row (suggestion buttons + ignore button).
+ * message HTML + actions row (suggestion buttons + optional ignore button).
  *
  * Appends `.harper-msg` and `.harper-actions` children to `container`.
  */
@@ -90,16 +92,18 @@ export function buildCardContent(
     actions.appendChild(btn);
   }
 
-  const ignore = document.createElement('button');
-  ignore.className = 'harper-ignore';
-  ignore.textContent = 'Ignore';
-  ignore.onmousedown = (e) => e.preventDefault();
-  ignore.onclick = (e) => {
-    e.stopPropagation();
-    if (callbacks.guard && !callbacks.guard(container)) return;
-    callbacks.onIgnore?.(container, diagnostic);
-  };
-  actions.appendChild(ignore);
+  if (callbacks.showIgnore !== false) {
+    const ignore = document.createElement('button');
+    ignore.className = 'harper-ignore';
+    ignore.textContent = 'Ignore';
+    ignore.onmousedown = (e) => e.preventDefault();
+    ignore.onclick = (e) => {
+      e.stopPropagation();
+      if (callbacks.guard && !callbacks.guard(container)) return;
+      callbacks.onIgnore?.(container, diagnostic);
+    };
+    actions.appendChild(ignore);
+  }
 
   container.appendChild(actions);
 }

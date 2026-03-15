@@ -4,7 +4,7 @@ import { EditorView, ViewPlugin } from '@codemirror/view';
 import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
-import { setAccentColor, buildCardContent, ignoreDiagnostic, injectCardCSS } from './card';
+import { setAccentColor, buildCardContent, injectCardCSS } from './card';
 
 const paneWidth = 290;
 
@@ -234,14 +234,11 @@ function renderPane(dom: HTMLElement, view: EditorView) {
         card.appendChild(word);
       }
 
-      // Shared card content: message + actions (suggestion buttons + ignore)
+      // Shared card content: message + actions (suggestion buttons only — no Ignore in sidebar)
       buildCardContent(card, view, diag, {
+        showIgnore: false,
         guard: (container) => !container.classList.contains('harper-pane-item-dismissing'),
         onApply: (container) => dismissCard(container, dom),
-        onIgnore: (container, d) => {
-          ignoreDiagnostic(view, d);
-          dismissCard(container, dom);
-        },
       });
 
       // Click to focus the issue in the editor
@@ -516,12 +513,9 @@ export function paneCSS(): string {
 }
 .harper-pane-item .harper-actions {
   margin-top: 8px;
+  flex-wrap: nowrap;
 }
 .harper-pane-item .harper-btn {
-  padding: 3px 8px;
-  font-size: 11px;
-}
-.harper-pane-item .harper-ignore {
   padding: 3px 8px;
   font-size: 11px;
 }
