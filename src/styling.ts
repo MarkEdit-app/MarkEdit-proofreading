@@ -1,7 +1,7 @@
 import { EditorView } from '@codemirror/view';
 
 // Harper lint kind → color, from packages/lint-framework/src/lint/lintKindColor.ts
-const kindColors: Record<string, string> = {
+export const kindColors: Record<string, string> = {
   Agreement: '#228B22',
   BoundaryError: '#8B4513',
   Capitalization: '#540D6E',
@@ -25,7 +25,7 @@ const kindColors: Record<string, string> = {
 };
 
 // Brighter variants for dark backgrounds
-const kindColorsDark: Record<string, string> = {
+export const kindColorsDark: Record<string, string> = {
   Agreement: '#4ADE80',
   BoundaryError: '#D4956C',
   Capitalization: '#B07DD8',

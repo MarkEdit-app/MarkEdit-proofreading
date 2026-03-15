@@ -2,6 +2,7 @@ import { MarkEdit } from 'markedit-api';
 import type { MenuItem } from 'markedit-api';
 import { setDiagnosticsEffect, lintToDiagnostic } from './decoration';
 import { lint, resetDictionary } from './lint';
+import { togglePanelEffect } from './panel';
 import { repoUrl } from './const';
 
 export function buildMenuItem(): MenuItem {
@@ -12,6 +13,10 @@ export function buildMenuItem(): MenuItem {
       {
         title: 'Proofread Now',
         action: proofreadNow,
+      },
+      {
+        title: 'Review Problems',
+        action: reviewProblems,
       },
       {
         title: 'Ignore All',
@@ -46,4 +51,8 @@ async function proofreadNow() {
 
 function ignoreAll() {
   MarkEdit.editorView.dispatch({ effects: setDiagnosticsEffect.of([]) });
+}
+
+function reviewProblems() {
+  MarkEdit.editorView.dispatch({ effects: togglePanelEffect.of(true) });
 }
