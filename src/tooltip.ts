@@ -77,9 +77,6 @@ export const tooltipHandlers = EditorView.domEventHandlers({
 // Tooltip-specific CSS — container, backdrop, close button, and size overrides
 // for the shared `.harper-msg`, `.harper-btn`, `.harper-ignore` base styles.
 export const tooltipCSS = `
-  .harper-tooltip-wrap {
-    padding-right: 10px;
-  }
   .harper-card {
     position: relative;
     border-radius: 10px;
@@ -211,7 +208,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       if (wrapper) {
         wrapper.style.background = 'transparent';
         wrapper.style.border = 'none';
-        wrapper.style.padding = '0';
+        wrapper.style.padding = '0 10px 0 0';
         wrapper.style.width = 'max-content';
       }
     },
