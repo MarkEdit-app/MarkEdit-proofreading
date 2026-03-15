@@ -7,6 +7,10 @@ function dictionaryPath(): string {
 }
 
 export async function loadWords(): Promise<string[]> {
+  if (typeof MarkEdit.getDirectoryPath !== 'function') {
+    return [];
+  }
+
   const content = await MarkEdit.getFileContent(dictionaryPath());
   if (!content) {
     return [];
@@ -16,6 +20,10 @@ export async function loadWords(): Promise<string[]> {
 }
 
 export async function saveWords(words: string[]): Promise<void> {
+  if (typeof MarkEdit.getDirectoryPath !== 'function') {
+    return;
+  }
+
   await MarkEdit.createFile({
     path: dictionaryPath(),
     string: words.join('\n'),
