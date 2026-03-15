@@ -150,7 +150,7 @@ function renderPane(dom: HTMLElement, view: EditorView) {
   ignoreAllBtn.className = 'harper-pane-action';
   ignoreAllBtn.textContent = 'Ignore All';
   ignoreAllBtn.onclick = () => {
-    view.dispatch({ effects: setDiagnosticsEffect.of([]) });
+    view.dispatch({ effects: [setDiagnosticsEffect.of([]), togglePanelEffect.of(false)] });
   };
   headerActions.appendChild(ignoreAllBtn);
 
