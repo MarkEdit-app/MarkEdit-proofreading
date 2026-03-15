@@ -110,10 +110,22 @@ function renderPane(dom: HTMLElement, view: EditorView) {
   const header = document.createElement('div');
   header.className = 'harper-pane-header';
 
+  const titleWrap = document.createElement('div');
+  titleWrap.className = 'harper-pane-title-wrap';
+
   const title = document.createElement('span');
   title.className = 'harper-pane-title';
   title.textContent = 'Problems';
-  header.appendChild(title);
+  titleWrap.appendChild(title);
+
+  const { diagnostics } = view.state.field(diagnosticsField);
+
+  const totalCount = document.createElement('span');
+  totalCount.className = 'harper-pane-total';
+  totalCount.textContent = `${diagnostics.length}`;
+  titleWrap.appendChild(totalCount);
+
+  header.appendChild(titleWrap);
 
   const headerActions = document.createElement('div');
   headerActions.className = 'harper-pane-header-actions';
@@ -141,8 +153,6 @@ function renderPane(dom: HTMLElement, view: EditorView) {
   // Body – scrollable list
   const body = document.createElement('div');
   body.className = 'harper-pane-body';
-
-  const { diagnostics } = view.state.field(diagnosticsField);
 
   if (diagnostics.length === 0) {
     const empty = document.createElement('div');
@@ -235,7 +245,7 @@ function renderPane(dom: HTMLElement, view: EditorView) {
         if (current) {
           view.dispatch({
             selection: { anchor: current.from, head: current.to },
-            scrollIntoView: true,
+            effects: EditorView.scrollIntoView(current.from, { y: 'center' }),
           });
           view.focus();
         }
@@ -290,23 +300,33 @@ export function paneCSS(): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
+  padding: 14px 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
 }
+.harper-pane-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .harper-pane-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #333;
+  color: #1a1a1a;
   letter-spacing: 0.1px;
+}
+.harper-pane-total {
+  font-size: 12px;
+  font-weight: 500;
+  color: #888;
 }
 .harper-pane-header-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .harper-pane-action {
-  padding: 3px 8px;
+  padding: 4px 10px;
   border: 1px solid #d0d7de;
   border-radius: 6px;
   background: #f6f8fa;
@@ -329,7 +349,7 @@ export function paneCSS(): string {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 4px;
+  padding: 5px;
   background: none;
   border: none;
   cursor: pointer;
@@ -348,67 +368,68 @@ export function paneCSS(): string {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 6px 0;
+  padding: 8px 0 16px;
   min-height: 0;
 }
 .harper-pane-empty {
-  padding: 24px 16px;
+  padding: 32px 20px;
   text-align: center;
   color: #999;
   font-size: 13px;
 }
 .harper-pane-section {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 .harper-pane-section-heading {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px 6px 9px;
-  margin: 0 8px;
-  border-left: 3px solid var(--harper-kind-color, ${fallback});
+  gap: 8px;
+  padding: 8px 16px 6px;
 }
 .harper-pane-section-heading .harper-badge {
   display: inline-block;
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
 .harper-pane-count {
-  font-size: 11px;
-  color: #999;
+  font-size: 12px;
+  color: #888;
   font-weight: 500;
 }
 .harper-pane-item {
   position: relative;
-  margin: 6px 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
+  margin: 8px 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
   cursor: pointer;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  transition: background 0.15s, border-color 0.15s;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
 }
 .harper-pane-item:hover {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.18);
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 .harper-pane-item:active {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .harper-pane-word {
   display: inline-block;
   font-size: 13px;
   font-weight: 600;
-  color: #333;
-  margin-bottom: 2px;
+  color: #1a1a1a;
+  margin-bottom: 3px;
   word-break: break-word;
 }
 .harper-pane-msg {
   font-size: 12px;
   color: #555;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 .harper-pane-msg p {
   margin: 0;
@@ -416,20 +437,20 @@ export function paneCSS(): string {
 .harper-pane-msg code {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
   font-size: 11px;
-  padding: 1px 3px;
-  border-radius: 3px;
+  padding: 1px 4px;
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.06);
 }
 .harper-pane-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-top: 5px;
+  gap: 6px;
+  margin-top: 8px;
 }
 .harper-pane-btn {
-  padding: 2px 6px;
+  padding: 3px 8px;
   border: 1px solid #d0d7de;
-  border-radius: 5px;
+  border-radius: 6px;
   background: #f6f8fa;
   color: #24292f;
   cursor: pointer;
@@ -458,7 +479,8 @@ export function paneCSS(): string {
   .harper-pane-header {
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
-  .harper-pane-title { color: #ddd; }
+  .harper-pane-title { color: #e0e0e0; }
+  .harper-pane-total { color: #777; }
   .harper-pane-action {
     border-color: #555;
     background: #3d3d3d;
@@ -474,18 +496,20 @@ export function paneCSS(): string {
   .harper-pane-close:active { background: rgba(255, 255, 255, 0.12); }
   .harper-pane-empty { color: #777; }
   .harper-pane-count { color: #777; }
-  .harper-pane-section-heading {
-    border-left-color: var(--harper-kind-color-dark, ${fallbackDark});
-  }
   .harper-pane-item {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   }
   .harper-pane-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
-  .harper-pane-item:active { background: rgba(255, 255, 255, 0.08); }
-  .harper-pane-word { color: #ddd; }
+  .harper-pane-item:active {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+  .harper-pane-word { color: #e0e0e0; }
   .harper-pane-msg { color: #aaa; }
   .harper-pane-msg code { background: rgba(255, 255, 255, 0.08); }
   .harper-pane-btn {

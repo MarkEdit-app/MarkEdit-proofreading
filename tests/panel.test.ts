@@ -27,22 +27,36 @@ describe('paneCSS', () => {
     expect(css).toContain('min-height: 0');
   });
 
-  it('applies accent color to section heading', () => {
+  it('includes title wrap and total count styles', () => {
     const css = paneCSS();
-    expect(css).toContain('.harper-pane-section-heading');
-    expect(css).toMatch(/\.harper-pane-section-heading\s*\{[^}]*border-left:/);
+    expect(css).toContain('.harper-pane-title-wrap');
+    expect(css).toContain('.harper-pane-total');
   });
 
-  it('adds border and spacing to cards', () => {
+  it('styles cards with border and shadow', () => {
     const css = paneCSS();
     expect(css).toMatch(/\.harper-pane-item\s*\{[^}]*border:\s*1px solid/);
-    expect(css).toMatch(/\.harper-pane-item\s*\{[^}]*margin:\s*6px/);
+    expect(css).toMatch(/\.harper-pane-item\s*\{[^}]*box-shadow:/);
+    expect(css).toMatch(/\.harper-pane-item\s*\{[^}]*margin:\s*8px/);
+  });
+
+  it('styles section heading without border-left', () => {
+    const css = paneCSS();
+    expect(css).toContain('.harper-pane-section-heading');
+    // Should NOT have a border-left on section heading
+    expect(css).not.toMatch(/\.harper-pane-section-heading\s*\{[^}]*border-left:/);
+  });
+
+  it('uses larger badge size', () => {
+    const css = paneCSS();
+    expect(css).toMatch(/\.harper-pane-section-heading\s+\.harper-badge\s*\{[^}]*font-size:\s*12px/);
+    expect(css).toMatch(/\.harper-pane-section-heading\s+\.harper-badge\s*\{[^}]*padding:\s*3px\s+8px/);
   });
 
   it('includes dark mode overrides', () => {
     const css = paneCSS();
     expect(css).toContain('@media (prefers-color-scheme: dark)');
-    expect(css).toContain('.harper-pane-title { color: #ddd; }');
+    expect(css).toContain('.harper-pane-title { color: #e0e0e0; }');
   });
 
   it('includes empty state and section styles', () => {
