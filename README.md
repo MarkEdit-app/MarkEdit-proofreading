@@ -2,6 +2,10 @@
 
 [MarkEdit](https://github.com/MarkEdit-app/MarkEdit) grammar checker based on [Harper](https://writewithharper.com/).
 
+<img src="./screenshots/01.png" width="640" title="Suggestion Card">
+
+<img src="./screenshots/02.png" width="640" title="Review Problems">
+
 ## Installation
 
 This extension is very big (24 MB) because it runs completely locally, install it by downloading `markedit-proofreading.js` from the [latest release](https://github.com/MarkEdit-app/MarkEdit-proofreading/releases/latest) and copying it to:
