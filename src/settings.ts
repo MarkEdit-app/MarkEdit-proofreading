@@ -39,7 +39,7 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
   ) as LintConfig;
 
   const disabledLintKinds = parseStringArray(raw.disabledLintKinds);
-  const addToDict = raw.addToDict === false ? false : true;
+  const addToDict = raw.addToDict !== false;
 
   return { autoLintDelay, lintPreset, lintRuleOverrides, disabledLintKinds, addToDict };
 }

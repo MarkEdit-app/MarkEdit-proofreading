@@ -4,6 +4,7 @@ import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
 import { setAccentColor, buildCardContent, ignoreDiagnostic, injectCardCSS } from './card';
+import { injectStyleSheet } from './styling';
 
 export const setClickTooltip = StateEffect.define<Diagnostic | null>();
 
@@ -141,13 +142,7 @@ export const tooltipCSS = `
 
 function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   injectCardCSS();
-
-  if (!document.getElementById('harper-tooltip-styles')) {
-    const style = document.createElement('style');
-    style.id = 'harper-tooltip-styles';
-    style.textContent = tooltipCSS;
-    document.head.appendChild(style);
-  }
+  injectStyleSheet('harper-tooltip-styles', tooltipCSS);
 
   const dom = document.createElement('div');
   dom.className = 'harper-tooltip-wrap';

@@ -5,6 +5,7 @@ import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
 import { setAccentColor, findDiagnostic, buildCardContent, injectCardCSS } from './card';
+import { injectStyleSheet } from './styling';
 
 const paneWidth = 290;
 
@@ -562,9 +563,5 @@ export function paneCSS(): string {
 
 function injectPaneCSS() {
   injectCardCSS();
-  if (document.getElementById('harper-pane-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'harper-pane-styles';
-  style.textContent = paneCSS();
-  document.head.appendChild(style);
+  injectStyleSheet('harper-pane-styles', paneCSS());
 }

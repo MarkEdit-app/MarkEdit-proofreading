@@ -13,7 +13,7 @@ import { EditorView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
 import { addToDictionary, shouldAddToDict } from './lint';
-import { kindColors, kindColorsDark, fallback, fallbackDark } from './styling';
+import { kindColors, kindColorsDark, fallback, fallbackDark, injectStyleSheet } from './styling';
 
 /** Set `--harper-kind-color` / `--harper-kind-color-dark` CSS custom properties on an element. */
 export function setAccentColor(el: HTMLElement, lintKind: string) {
@@ -188,9 +188,5 @@ export function cardContentCSS(): string {
 
 /** Inject the shared card content CSS once. */
 export function injectCardCSS() {
-  if (document.getElementById('harper-card-base-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'harper-card-base-styles';
-  style.textContent = cardContentCSS();
-  document.head.appendChild(style);
+  injectStyleSheet('harper-card-base-styles', cardContentCSS());
 }
