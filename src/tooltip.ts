@@ -208,7 +208,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
       if (wrapper) {
         wrapper.style.background = 'transparent';
         wrapper.style.border = 'none';
-        wrapper.style.padding = '0 10px 0 0';
+        wrapper.style.padding = '0 12px 0 0';
         wrapper.style.width = 'max-content';
       }
     },
