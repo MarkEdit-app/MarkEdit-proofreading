@@ -141,6 +141,10 @@ function renderPane(dom: HTMLElement, view: EditorView) {
   const header = document.createElement('div');
   header.className = 'harper-pane-header';
 
+  // Row 1: title + count badge + close button
+  const titleRow = document.createElement('div');
+  titleRow.className = 'harper-pane-title-row';
+
   const titleWrap = document.createElement('div');
   titleWrap.className = 'harper-pane-title-wrap';
 
@@ -156,8 +160,21 @@ function renderPane(dom: HTMLElement, view: EditorView) {
   totalCount.textContent = `${diagnostics.length}`;
   titleWrap.appendChild(totalCount);
 
-  header.appendChild(titleWrap);
+  titleRow.appendChild(titleWrap);
 
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'harper-pane-close';
+  closeBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
+  closeBtn.title = 'Close';
+  closeBtn.ariaLabel = 'Close';
+  closeBtn.onclick = () => {
+    view.dispatch({ effects: togglePanelEffect.of(false) });
+  };
+  titleRow.appendChild(closeBtn);
+
+  header.appendChild(titleRow);
+
+  // Row 2: action buttons
   const headerActions = document.createElement('div');
   headerActions.className = 'harper-pane-header-actions';
 
@@ -168,16 +185,6 @@ function renderPane(dom: HTMLElement, view: EditorView) {
     view.dispatch({ effects: [setDiagnosticsEffect.of([]), togglePanelEffect.of(false)] });
   };
   headerActions.appendChild(ignoreAllBtn);
-
-  const closeBtn = document.createElement('button');
-  closeBtn.className = 'harper-pane-close';
-  closeBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
-  closeBtn.title = 'Close';
-  closeBtn.ariaLabel = 'Close';
-  closeBtn.onclick = () => {
-    view.dispatch({ effects: togglePanelEffect.of(false) });
-  };
-  headerActions.appendChild(closeBtn);
 
   header.appendChild(headerActions);
   dom.appendChild(header);
@@ -354,11 +361,16 @@ export function paneCSS(): string {
 }
 .harper-pane-header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 12px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
+}
+.harper-pane-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 .harper-pane-title-wrap {
   display: flex;
@@ -366,15 +378,21 @@ export function paneCSS(): string {
   gap: 8px;
 }
 .harper-pane-title {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: #1a1a1a;
-  letter-spacing: 0.1px;
+  letter-spacing: -0.2px;
 }
 .harper-pane-total {
-  font-size: 12px;
-  font-weight: 500;
-  color: #888;
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 8px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
 }
 .harper-pane-header-actions {
   display: flex;
@@ -383,10 +401,10 @@ export function paneCSS(): string {
 }
 .harper-pane-action {
   padding: 4px 10px;
-  border: 1px solid #d0d7de;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 6px;
-  background: #f6f8fa;
-  color: #24292f;
+  background: transparent;
+  color: #555;
   cursor: pointer;
   font-size: 11px;
   font-weight: 500;
@@ -395,22 +413,22 @@ export function paneCSS(): string {
   transition: background 0.15s, border-color 0.15s;
 }
 .harper-pane-action:hover {
-  background: #eaeef2;
-  border-color: #afb8c1;
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.2);
 }
 .harper-pane-action:active {
-  background: #d8dee4;
+  background: rgba(0, 0, 0, 0.08);
 }
 .harper-pane-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px;
+  padding: 6px;
   background: none;
   border: none;
   cursor: pointer;
   color: #888;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: color 0.15s, background 0.15s;
 }
 .harper-pane-close:hover {
@@ -524,17 +542,17 @@ export function paneCSS(): string {
     border-bottom-color: rgba(255, 255, 255, 0.08);
   }
   .harper-pane-title { color: #f0f0f0; }
-  .harper-pane-total { color: #999; }
+  .harper-pane-total { color: #bbb; background: rgba(255, 255, 255, 0.08); }
   .harper-pane-action {
-    border-color: #464a4f;
-    background: #323639;
-    color: #e2e4e8;
+    border-color: rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: #bbb;
   }
   .harper-pane-action:hover {
-    background: #3a3e42;
-    border-color: #525659;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.2);
   }
-  .harper-pane-action:active { background: #42464a; }
+  .harper-pane-action:active { background: rgba(255, 255, 255, 0.1); }
   .harper-pane-close { color: #999; }
   .harper-pane-close:hover { color: #ddd; background: rgba(255, 255, 255, 0.1); }
   .harper-pane-close:active { background: rgba(255, 255, 255, 0.15); }
