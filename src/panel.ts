@@ -29,6 +29,7 @@ const panelOpenField = StateField.define<boolean>({
 
 const panelPlugin = ViewPlugin.fromClass(class {
   private pane: HTMLElement | null = null;
+  private rafId = 0;
 
   constructor(readonly view: EditorView) {
     this.sync();
@@ -79,27 +80,38 @@ const panelPlugin = ViewPlugin.fromClass(class {
 
     // Animate margin and pane slide-in on next frame
     this.view.scrollDOM.style.transition = 'margin-right 0.2s ease-out';
-    requestAnimationFrame(() => {
+    this.rafId = requestAnimationFrame(() => {
+      this.rafId = 0;
+      if (this.pane !== pane) return;
       pane.classList.add('harper-pane-visible');
       this.view.scrollDOM.style.marginRight = `${paneWidth}px`;
     });
   }
 
   close() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
+    }
     if (this.pane) {
       this.pane.classList.remove('harper-pane-visible');
       this.view.scrollDOM.style.marginRight = '';
 
       // Remove DOM after the transition ends
       const pane = this.pane;
+      const scrollDOM = this.view.scrollDOM;
       this.pane = null;
       const onEnd = () => {
         pane.removeEventListener('transitionend', onEnd);
         pane.remove();
+        scrollDOM.style.transition = '';
       };
       pane.addEventListener('transitionend', onEnd);
       // Safety fallback in case transitionend doesn't fire
-      setTimeout(() => { if (pane.parentNode) pane.remove(); }, 250);
+      setTimeout(() => {
+        if (pane.parentNode) pane.remove();
+        scrollDOM.style.transition = '';
+      }, 250);
     }
     this.view.dom.classList.remove('harper-pane-open');
   }
@@ -110,6 +122,10 @@ const panelPlugin = ViewPlugin.fromClass(class {
   }
 
   destroy() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = 0;
+    }
     this.close();
   }
 });

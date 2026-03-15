@@ -27,7 +27,12 @@ export const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; d
   },
   update(value, tr) {
     if (tr.docChanged && value.decorations !== Decoration.none) {
-      value = { diagnostics: value.diagnostics, decorations: value.decorations.map(tr.changes) };
+      const mappedDiags = value.diagnostics.map(d => ({
+        ...d,
+        from: tr.changes.mapPos(d.from, 1),
+        to: tr.changes.mapPos(d.to, -1),
+      })).filter(d => d.from < d.to);
+      value = { diagnostics: mappedDiags, decorations: value.decorations.map(tr.changes) };
     }
 
     for (const effect of tr.effects) {

@@ -57,8 +57,13 @@ function ignoreAll() {
 
 async function reviewProblems() {
   const view = MarkEdit.editorView;
-  const text = view.state.doc.toString();
+  const doc = view.state.doc;
+  const text = doc.toString();
   const lints = await lint(text);
+
+  // Bail out if the document changed during linting
+  if (view.state.doc !== doc) return;
+
   view.dispatch({
     effects: [
       setClickTooltip.of(null),
