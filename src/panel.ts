@@ -340,12 +340,13 @@ function dismissCard(card: HTMLElement, paneRoot: HTMLElement) {
 
     // Update total count
     const totalEl = paneRoot.querySelector('.harper-pane-total');
+    const remainingTotal = paneRoot.querySelectorAll('.harper-pane-item').length;
     if (totalEl) {
-      totalEl.textContent = `${paneRoot.querySelectorAll('.harper-pane-item').length}`;
+      totalEl.textContent = `${remainingTotal}`;
     }
 
     // Show empty state if no items remain
-    if (paneRoot.querySelectorAll('.harper-pane-item').length === 0) {
+    if (remainingTotal === 0) {
       const body = paneRoot.querySelector('.harper-pane-body');
       if (body) {
         body.innerHTML = '';
