@@ -77,6 +77,9 @@ export const tooltipHandlers = EditorView.domEventHandlers({
 // Tooltip-specific CSS — container, backdrop, close button, and size overrides
 // for the shared `.harper-msg`, `.harper-btn`, `.harper-ignore` base styles.
 export const tooltipCSS = `
+  .harper-tooltip-wrap {
+    padding-right: 10px;
+  }
   .harper-card {
     position: relative;
     border-radius: 10px;
@@ -115,10 +118,6 @@ export const tooltipCSS = `
     justify-content: center;
   }
   .harper-card .harper-close:hover { color: #444; }
-  .harper-card .harper-inner {
-    position: relative;
-    padding-right: 10px;
-  }
   .harper-card .harper-content {
     position: relative;
     padding: 12px;
@@ -153,13 +152,16 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   }
 
   const dom = document.createElement('div');
-  dom.className = 'harper-card';
-  setAccentColor(dom, diagnostic.lintKind);
+  dom.className = 'harper-tooltip-wrap';
+
+  const card = document.createElement('div');
+  card.className = 'harper-card';
+  setAccentColor(card, diagnostic.lintKind);
 
   // Background layer for translucent blended color
   const bg = document.createElement('div');
   bg.className = 'harper-bg';
-  dom.appendChild(bg);
+  card.appendChild(bg);
 
   // Close button at card level (top-right corner)
   const close = document.createElement('button');
@@ -171,10 +173,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   close.onclick = () => {
     view.dispatch({ effects: setClickTooltip.of(null) });
   };
-  dom.appendChild(close);
-
-  const inner = document.createElement('div');
-  inner.className = 'harper-inner';
+  card.appendChild(close);
 
   const content = document.createElement('div');
   content.className = 'harper-content';
@@ -201,8 +200,8 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
     },
   });
 
-  inner.appendChild(content);
-  dom.appendChild(inner);
+  card.appendChild(content);
+  dom.appendChild(card);
 
   return {
     dom,
