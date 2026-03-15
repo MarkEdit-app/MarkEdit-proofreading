@@ -3,6 +3,7 @@ import { showTooltip, EditorView } from '@codemirror/view';
 import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import { addToDictionary, shouldAddToDict } from './lint';
+import { kindColors, kindColorsDark } from './styling';
 import type { Diagnostic } from './decoration';
 
 const setClickTooltip = StateEffect.define<Diagnostic | null>();
@@ -122,7 +123,8 @@ const cardCSS = `
     font-size: 12px;
     padding: 1px 4px;
     border-radius: 4px;
-    background: rgba(0, 0, 0, 0.06);
+    color: var(--harper-kind-color, #24292f);
+    background: color-mix(in srgb, var(--harper-kind-color, #6c757d) 10%, transparent);
   }
   .harper-card .harper-btn {
     padding: 2px 6px;
@@ -166,7 +168,10 @@ const cardCSS = `
     .harper-card .harper-close { color: #777; }
     .harper-card .harper-close:hover { color: #bbb; }
     .harper-card .harper-msg { color: #aaaaaa; }
-    .harper-card .harper-msg code { background: rgba(255, 255, 255, 0.08); }
+    .harper-card .harper-msg code {
+      color: var(--harper-kind-color-dark, #f0f0f0);
+      background: color-mix(in srgb, var(--harper-kind-color-dark, #B8C0CC) 15%, transparent);
+    }
     .harper-card .harper-btn {
       border-color: #464a4f;
       background: #323639;
@@ -195,6 +200,12 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
 
   const dom = document.createElement('div');
   dom.className = 'harper-card';
+
+  // Set accent color custom properties for code elements
+  const fallback = '#6c757d';
+  const fallbackDark = '#B8C0CC';
+  dom.style.setProperty('--harper-kind-color', kindColors[diagnostic.lintKind] ?? fallback);
+  dom.style.setProperty('--harper-kind-color-dark', kindColorsDark[diagnostic.lintKind] ?? fallbackDark);
 
   // Background layer for translucent blended color
   const bg = document.createElement('div');
