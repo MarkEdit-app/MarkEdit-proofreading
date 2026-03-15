@@ -77,3 +77,7 @@ Build the extension (runs lint, tests, then [Vite](https://vite.dev/)):
 ```sh
 yarn build
 ```
+
+## Contribution
+
+Bug fix pull requests are generally welcome. For feature additions or behavior changes, please open a discussion or issue first so the approach can be agreed upon before any work begins.
