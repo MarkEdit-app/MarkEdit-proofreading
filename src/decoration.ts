@@ -27,7 +27,15 @@ export const diagnosticsField = StateField.define<{ diagnostics: Diagnostic[]; d
   },
   update(value, tr) {
     if (tr.docChanged && value.decorations !== Decoration.none) {
-      value = { diagnostics: value.diagnostics, decorations: value.decorations.map(tr.changes) };
+      // Map positions through changes: `from` biases forward (1) so an insertion
+      // at the exact start pushes the diagnostic right; `to` biases backward (-1)
+      // so an insertion at the exact end doesn't expand the range.
+      const mappedDiags = value.diagnostics.map(d => ({
+        ...d,
+        from: tr.changes.mapPos(d.from, 1),
+        to: tr.changes.mapPos(d.to, -1),
+      })).filter(d => d.from < d.to);
+      value = { diagnostics: mappedDiags, decorations: value.decorations.map(tr.changes) };
     }
 
     for (const effect of tr.effects) {

@@ -1,7 +1,7 @@
 import { EditorView } from '@codemirror/view';
 
 // Harper lint kind → color, from packages/lint-framework/src/lint/lintKindColor.ts
-const kindColors: Record<string, string> = {
+export const kindColors: Record<string, string> = {
   Agreement: '#228B22',
   BoundaryError: '#8B4513',
   Capitalization: '#540D6E',
@@ -25,31 +25,31 @@ const kindColors: Record<string, string> = {
 };
 
 // Brighter variants for dark backgrounds
-const kindColorsDark: Record<string, string> = {
-  Agreement: '#4ADE80',
-  BoundaryError: '#D4956C',
-  Capitalization: '#B07DD8',
-  Eggcorn: '#FFB347',
-  Enhancement: '#34D399',
-  Formatting: '#C49CDE',
-  Grammar: '#C084FC',
-  Malapropism: '#F472B6',
-  Miscellaneous: '#5EDDC0',
-  Nonstandard: '#2DD4BF',
-  Punctuation: '#F5A623',
-  Readability: '#4BC584',
-  Redundancy: '#7CB3D9',
-  Regionalism: '#D8A0E0',
-  Repetition: '#34D399',
-  Spelling: '#FF6B8A',
-  Style: '#FFD54F',
-  Typo: '#FF9466',
-  Usage: '#60B3FF',
-  WordChoice: '#4ADE80',
+export const kindColorsDark: Record<string, string> = {
+  Agreement: '#6AEE9A',
+  BoundaryError: '#E8B08A',
+  Capitalization: '#CCA0EA',
+  Eggcorn: '#FFC870',
+  Enhancement: '#5EEAB5',
+  Formatting: '#D9B8EA',
+  Grammar: '#D4A0FF',
+  Malapropism: '#FF8CCE',
+  Miscellaneous: '#7AECD6',
+  Nonstandard: '#50E8D8',
+  Punctuation: '#FFBE50',
+  Readability: '#6CD8A0',
+  Redundancy: '#98CCE8',
+  Regionalism: '#E8B8F0',
+  Repetition: '#5EEAB5',
+  Spelling: '#FF8DA6',
+  Style: '#FFE070',
+  Typo: '#FFB088',
+  Usage: '#80C8FF',
+  WordChoice: '#6AEE9A',
 };
 
-const fallback = '#6c757d';
-const fallbackDark = '#9CA3AF';
+export const fallback = '#6c757d';
+export const fallbackDark = '#B8C0CC';
 
 export function kindCSS(): string {
   let css = '';
