@@ -92,3 +92,12 @@ export const baseTheme = EditorView.baseTheme({
     transition: 'text-decoration-color 0.15s, background-color 0.15s',
   },
 });
+
+/** Inject a `<style>` element once, keyed by `id`. No-op if already present. */
+export function injectStyleSheet(id: string, css: string): void {
+  if (document.getElementById(id)) return;
+  const style = document.createElement('style');
+  style.id = id;
+  style.textContent = css;
+  document.head.appendChild(style);
+}

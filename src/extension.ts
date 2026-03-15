@@ -6,19 +6,14 @@ import { MarkEdit } from 'markedit-api';
 import { diagnosticsField, setDiagnosticsEffect, lintToDiagnostic } from './decoration';
 import { clickTooltipField, tooltipHandlers } from './tooltip';
 import { panelExtension } from './panel';
-import { baseTheme, kindCSS } from './styling';
+import { baseTheme, kindCSS, injectStyleSheet } from './styling';
 import { lint } from './lint';
 import { getProofreadingSettings } from './settings';
 
 const { autoLintDelay } = getProofreadingSettings(MarkEdit.userSettings);
 
 const kindStyleInjector = ViewPlugin.define(() => {
-  if (!document.getElementById('harper-kind-styles')) {
-    const style = document.createElement('style');
-    style.id = 'harper-kind-styles';
-    style.textContent = kindCSS();
-    document.head.appendChild(style);
-  }
+  injectStyleSheet('harper-kind-styles', kindCSS());
   return {};
 });
 

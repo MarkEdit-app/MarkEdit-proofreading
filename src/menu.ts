@@ -26,7 +26,7 @@ export function buildMenuItem(): MenuItem {
       },
       {
         title: 'Reset Dictionary',
-        action: async() => {
+        action: async () => {
           const result = await MarkEdit.showAlert({
             title: 'Are you sure you want to reset the dictionary?',
             message: 'All custom words you have added will be removed. This action cannot be undone.',
@@ -54,8 +54,13 @@ export function buildMenuItem(): MenuItem {
 
 async function proofreadNow() {
   const view = MarkEdit.editorView;
-  const text = view.state.doc.toString();
+  const doc = view.state.doc;
+  const text = doc.toString();
   const lints = await lint(text);
+
+  // Bail out if the document changed during linting
+  if (view.state.doc !== doc) return;
+
   view.dispatch({ effects: setDiagnosticsEffect.of(lints.map(lintToDiagnostic)) });
 }
 
