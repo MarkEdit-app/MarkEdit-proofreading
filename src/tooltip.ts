@@ -39,6 +39,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
     const target = event.target as HTMLElement;
     if (target.closest('.cm-tooltip')) return false;
     if (!target.closest('.cm-harper-lint')) return false;
+    if (event.detail >= 2) return false;
 
     event.preventDefault();
     return true;
@@ -47,7 +48,7 @@ export const tooltipHandlers = EditorView.domEventHandlers({
     const target = event.target as HTMLElement;
     if (target.closest('.cm-tooltip')) return false;
 
-    if (target.closest('.cm-harper-lint')) {
+    if (target.closest('.cm-harper-lint') && event.detail < 2) {
       const pos = view.posAtCoords({ x: event.clientX, y: event.clientY });
       if (pos !== null) {
         const { diagnostics } = view.state.field(diagnosticsField);
