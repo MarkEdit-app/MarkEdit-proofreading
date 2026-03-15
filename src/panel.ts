@@ -8,7 +8,7 @@ import { kindColors, kindColorsDark } from './styling';
 
 const fallback = '#6c757d';
 const fallbackDark = '#9CA3AF';
-const paneWidth = 320;
+const paneWidth = 290;
 
 /** Toggle the review-problems pane open / closed. */
 export const togglePanelEffect = StateEffect.define<boolean>();
