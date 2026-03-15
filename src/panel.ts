@@ -4,6 +4,7 @@ import { EditorView, ViewPlugin } from '@codemirror/view';
 import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
+import { addToDictionary, shouldAddToDict } from './lint';
 import { kindColors, kindColorsDark } from './styling';
 
 const fallback = '#6c757d';
@@ -246,35 +247,56 @@ function renderPane(dom: HTMLElement, view: EditorView) {
       card.appendChild(msg);
 
       // Actions row
-      if (diag.actions.length > 0) {
-        const actions = document.createElement('div');
-        actions.className = 'harper-pane-actions';
+      const actions = document.createElement('div');
+      actions.className = 'harper-pane-actions';
 
-        for (const action of diag.actions) {
-          const btn = document.createElement('button');
-          btn.className = 'harper-pane-btn';
-          btn.textContent = action.name;
-          btn.onmousedown = (e) => e.preventDefault();
-          btn.onclick = (e) => {
-            e.stopPropagation();
-            if (card.classList.contains('harper-pane-item-dismissing')) return;
+      for (const action of diag.actions) {
+        const btn = document.createElement('button');
+        btn.className = 'harper-pane-btn';
+        btn.textContent = action.name;
+        btn.onmousedown = (e) => e.preventDefault();
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          if (card.classList.contains('harper-pane-item-dismissing')) return;
 
-            const current = view.state.field(diagnosticsField).diagnostics.find(d =>
-              d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
-            );
-            if (!current) return;
+          const current = view.state.field(diagnosticsField).diagnostics.find(d =>
+            d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind,
+          );
+          if (!current) return;
 
-            // Apply the fix
-            action.apply(view, current.from, current.to);
+          // Apply the fix
+          action.apply(view, current.from, current.to);
 
-            // Animate card dismissal
-            dismissCard(card, dom);
-          };
-          actions.appendChild(btn);
-        }
-
-        card.appendChild(actions);
+          // Animate card dismissal
+          dismissCard(card, dom);
+        };
+        actions.appendChild(btn);
       }
+
+      // Ignore button — removes this diagnostic (and adds to dictionary if configured)
+      const ignore = document.createElement('button');
+      ignore.className = 'harper-pane-ignore';
+      ignore.textContent = 'Ignore';
+      ignore.onmousedown = (e) => e.preventDefault();
+      ignore.onclick = (e) => {
+        e.stopPropagation();
+        if (card.classList.contains('harper-pane-item-dismissing')) return;
+
+        if (shouldAddToDict && diag.problemText) {
+          void addToDictionary(diag.problemText);
+        }
+        const { diagnostics: currentDiags } = view.state.field(diagnosticsField);
+        const filtered = currentDiags.filter(d =>
+          !(d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind),
+        );
+        view.dispatch({ effects: setDiagnosticsEffect.of(filtered) });
+
+        // Animate card dismissal
+        dismissCard(card, dom);
+      };
+      actions.appendChild(ignore);
+
+      card.appendChild(actions);
 
       // Click to focus the issue in the editor
       card.onclick = () => {
@@ -558,6 +580,7 @@ export function paneCSS(): string {
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 8px;
+  align-items: center;
 }
 .harper-pane-btn {
   padding: 3px 8px;
@@ -579,6 +602,22 @@ export function paneCSS(): string {
 .harper-pane-btn:active {
   background: #d8dee4;
 }
+.harper-pane-ignore {
+  padding: 3px 8px;
+  border: 1px solid #c0c0c0;
+  border-radius: 6px;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 400;
+  font-family: inherit;
+  line-height: 1.4;
+  margin-left: auto;
+  transition: background 0.15s, border-color 0.15s;
+}
+.harper-pane-ignore:hover { background: rgba(0, 0, 0, 0.05); border-color: #999; }
+.harper-pane-ignore:active { background: rgba(0, 0, 0, 0.08); }
 `;
 
   // Dark mode overrides
@@ -637,6 +676,13 @@ export function paneCSS(): string {
     border-color: #525659;
   }
   .harper-pane-btn:active { background: #42464a; }
+  .harper-pane-ignore {
+    border-color: #555;
+    background: transparent;
+    color: #bbb;
+  }
+  .harper-pane-ignore:hover { background: rgba(255, 255, 255, 0.08); border-color: #666; }
+  .harper-pane-ignore:active { background: rgba(255, 255, 255, 0.12); }
 }
 `;
 
