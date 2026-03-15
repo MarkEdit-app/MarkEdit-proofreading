@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "MarkEdit grammar checker based on Harper.",
   "scripts": {
-    "build": "yarn lint && yarn test && vite build",
+    "build": "vite build",
+    "precheck": "yarn lint && yarn test",
     "lint": "eslint .",
     "test": "vitest run",
     "reload": "osascript -e 'quit app \"MarkEdit\"' -e 'delay 1' -e 'launch app \"MarkEdit\"'",
