@@ -35,7 +35,9 @@ export function ignoreDiagnostic(view: EditorView, diag: Diagnostic, extraEffect
   }
   const { diagnostics } = view.state.field(diagnosticsField);
   const filtered = diagnostics.filter(d =>
-    !(d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind),
+    diag.problemText
+      ? d.problemText !== diag.problemText
+      : !(d.from === diag.from && d.to === diag.to && d.lintKind === diag.lintKind),
   );
   view.dispatch({ effects: [setDiagnosticsEffect.of(filtered), ...extraEffects] });
 }
