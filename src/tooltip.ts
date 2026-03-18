@@ -159,7 +159,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   // Close button at card level (top-right corner)
   const close = document.createElement('button');
   close.className = 'harper-close';
-  close.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
+  close.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
   close.title = 'Close';
   close.ariaLabel = 'Close';
   close.onmousedown = (e) => e.preventDefault();
