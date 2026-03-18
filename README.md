@@ -8,7 +8,7 @@
 
 ## Installation
 
-This extension is very big (24 MB) because it runs completely locally, install it by downloading `markedit-proofreading.js` from the [latest release](https://github.com/MarkEdit-app/MarkEdit-proofreading/releases/latest) and copying it to:
+This extension is large (24 MB) because it runs completely locally. Install it by downloading `markedit-proofreading.js` from the [latest release](https://github.com/MarkEdit-app/MarkEdit-proofreading/releases/latest) and copying it to:
 
 ```
 ~/Library/Containers/app.cyan.markedit/Data/Documents/scripts
@@ -18,7 +18,7 @@ Restart MarkEdit after copying the file.
 
 ## Configuration
 
-This extension provides three presets to control how aggressively Harper checks your writing. Presets disable specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules) and filter by lint kind as a safety net:
+This extension provides three presets to control how aggressively Harper checks your writing. Each preset disables specific [rules](https://writewithharper.com/docs/rules) via [`setLintConfig`](https://writewithharper.com/docs/harperjs/configurerules) and filters by lint kind as a safety net:
 
 - `"strict"` (default): All Harper rules are active
 - `"standard"`: Disables Enhancement, Style, and WordChoice rules
@@ -41,11 +41,11 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 }
 ```
 
-- `autoLintDelay`: Delay in milliseconds before automatic proofreading runs after a document change (default: `1000`). Set to `-1` to disable automatic proofreading entirely (use "Proofread Now" to lint on demand)
-- `addToDict`: When `true` (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary so it won't be flagged in future sessions. Set to `false` to disable this behavior
-- `lintPreset`: `"strict"` (default), `"standard"`, or `"relaxed"`
-- `lintRuleOverrides`: Per-rule overrides (`true` / `false` / `null`) applied on top of the preset
-- `disabledLintKinds`: Additional lint kinds to filter out, available kinds:
+- `autoLintDelay`: Delay in milliseconds before automatic proofreading runs after a document change (default: `1000`). Set to `-1` to disable automatic proofreading entirely (use "Proofread Now" to lint on demand).
+- `addToDict`: When `true` (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary so it won't be flagged in future sessions. Set to `false` to disable this behavior.
+- `lintPreset`: `"strict"` (default), `"standard"`, or `"relaxed"`.
+- `lintRuleOverrides`: Per-rule overrides (`true` / `false` / `null`) applied on top of the preset.
+- `disabledLintKinds`: Additional lint kinds to filter out. Available kinds:
   - `Agreement`, `BoundaryError`, `Capitalization`, `Eggcorn`, `Enhancement`
   - `Formatting`, `Grammar`, `Malapropism`, `Miscellaneous`, `Nonstandard`
   - `Punctuation`, `Readability`, `Redundancy`, `Regionalism`, `Repetition`
@@ -56,7 +56,7 @@ https://writewithharper.com/docs/rules
 
 ## Dictionary
 
-When `addToDict` is enabled (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary persisted at `~/Library/Containers/app.cyan.markedit/Data/Documents/proofreading-dict.txt`. Dictionary words are automatically loaded when the extension starts.
+When `addToDict` is enabled (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary stored at `~/Library/Containers/app.cyan.markedit/Data/Documents/proofreading-dict.txt`. Dictionary words are automatically loaded when the extension starts.
 
 ## Development
 
