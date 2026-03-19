@@ -4,6 +4,7 @@ import type { Tooltip, TooltipView } from '@codemirror/view';
 import { diagnosticsField } from './decoration';
 import type { Diagnostic } from './decoration';
 import { setAccentColor, buildCardContent, ignoreDiagnostic, injectCardCSS } from './card';
+import { closeSvg, systemFont } from './const';
 import { injectStyleSheet } from './styling';
 
 export const setClickTooltip = StateEffect.define<Diagnostic | null>();
@@ -85,7 +86,7 @@ export const tooltipCSS = `
     overflow: hidden;
     max-width: 320px;
     min-width: 220px;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+    font-family: ${systemFont};
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
@@ -159,7 +160,7 @@ function createTooltip(view: EditorView, diagnostic: Diagnostic) {
   // Close button at card level (top-right corner)
   const close = document.createElement('button');
   close.className = 'harper-close';
-  close.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
+  close.innerHTML = closeSvg;
   close.title = 'Close';
   close.ariaLabel = 'Close';
   close.onmousedown = (e) => e.preventDefault();

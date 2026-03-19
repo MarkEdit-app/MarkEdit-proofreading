@@ -5,6 +5,7 @@ import type { ViewUpdate } from '@codemirror/view';
 import { diagnosticsField, setDiagnosticsEffect } from './decoration';
 import type { Diagnostic } from './decoration';
 import { setAccentColor, findDiagnostic, buildCardContent, injectCardCSS } from './card';
+import { closeSvg, systemFont } from './const';
 import { injectStyleSheet } from './styling';
 
 const paneWidth = 290;
@@ -171,7 +172,7 @@ function renderPane(dom: HTMLElement, view: EditorView) {
 
   const closeBtn = document.createElement('button');
   closeBtn.className = 'harper-pane-close';
-  closeBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><line x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg>';
+  closeBtn.innerHTML = closeSvg;
   closeBtn.title = 'Close';
   closeBtn.ariaLabel = 'Close';
   closeBtn.onclick = () => {
@@ -334,7 +335,7 @@ export function paneCSS(): string {
   right: 0;
   bottom: 0;
   width: ${paneWidth}px;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+  font-family: ${systemFont};
   border-left: 1px solid rgba(0, 0, 0, 0.12);
   background: rgba(255, 255, 255, 0.6);
   -webkit-backdrop-filter: blur(12px);
