@@ -5,6 +5,12 @@ const settingsKey = 'extension.markeditProofreading';
 
 export type LintPreset = 'strict' | 'standard' | 'relaxed';
 
+// Dialects supported by Harper. Kept as strings here so this module stays free of any
+// harper.js (WebAssembly) import; lint.ts maps these names to the harper.js `Dialect` enum.
+export type DialectName = 'American' | 'British' | 'Australian' | 'Canadian' | 'Indian';
+
+const dialectNames: readonly DialectName[] = ['American', 'British', 'Australian', 'Canadian', 'Indian'];
+
 type JSONObject = MarkEdit['userSettings'];
 type JSONValue = JSONObject[string];
 
@@ -14,6 +20,8 @@ export interface ProofreadingSettings {
   lintRuleOverrides: LintConfig;
   disabledLintKinds: string[];
   addToDict: boolean;
+  dialect: DialectName;
+  dialectFallbacks: DialectName[];
 }
 
 export function getProofreadingSettings(userSettings: JSONObject | undefined): ProofreadingSettings {
@@ -23,6 +31,8 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
     lintRuleOverrides: {},
     disabledLintKinds: [],
     addToDict: true,
+    dialect: 'American',
+    dialectFallbacks: [],
   };
 
   const root = asObject(userSettings);
@@ -40,8 +50,10 @@ export function getProofreadingSettings(userSettings: JSONObject | undefined): P
 
   const disabledLintKinds = parseStringArray(raw.disabledLintKinds);
   const addToDict = raw.addToDict !== false;
+  const dialect = parseDialect(raw.dialect);
+  const dialectFallbacks = parseDialectList(raw.dialectFallbacks, dialect);
 
-  return { autoLintDelay, lintPreset, lintRuleOverrides, disabledLintKinds, addToDict };
+  return { autoLintDelay, lintPreset, lintRuleOverrides, disabledLintKinds, addToDict, dialect, dialectFallbacks };
 }
 
 function parseLintPreset(value: JSONValue): LintPreset {
@@ -58,6 +70,31 @@ function parseAutoLintDelay(value: JSONValue): number {
   }
 
   return 1000;
+}
+
+function parseDialect(value: JSONValue): DialectName {
+  return isDialectName(value) ? value : 'American';
+}
+
+// Parses fallback dialects, dropping invalid names, duplicates, and the primary dialect
+// (a fallback to the primary itself would be a no-op).
+function parseDialectList(value: JSONValue, primary: DialectName): DialectName[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const fallbacks = new Set<DialectName>();
+  for (const item of value) {
+    if (isDialectName(item) && item !== primary) {
+      fallbacks.add(item);
+    }
+  }
+
+  return [...fallbacks];
+}
+
+function isDialectName(value: JSONValue): value is DialectName {
+  return typeof value === 'string' && (dialectNames as readonly string[]).includes(value);
 }
 
 function asObject(value: JSONValue | undefined): JSONObject | undefined {

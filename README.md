@@ -30,7 +30,9 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
       "SpelledNumbers": false,
       "NoOxfordComma": true
     },
-    "disabledLintKinds": ["Regionalism"]
+    "disabledLintKinds": ["Regionalism"],
+    "dialect": "Australian",
+    "dialectFallbacks": ["American"]
   }
 }
 ```
@@ -39,6 +41,8 @@ You can customize behavior from `settings.json` with the `extension.markeditProo
 - `addToDict`: When `true` (default), clicking "Ignore" on a flagged word also adds it to a personal dictionary so it won't be flagged in future sessions. Set to `false` to disable this behavior.
 - `lintPreset`: `"strict"` (default), `"standard"`, or `"relaxed"`.
 - `lintRuleOverrides`: Per-rule overrides (`true` / `false` / `null`) applied on top of the preset.
+- `dialect`: The English dialect Harper checks against (default: `"American"`). One of `"American"`, `"British"`, `"Australian"`, `"Canadian"`, or `"Indian"`. Determines which spellings are flagged and which spellings suggestions prefer.
+- `dialectFallbacks`: Additional dialects whose spellings are also accepted (default: `[]`). A word flagged as a misspelling by `dialect` is kept only if every fallback dialect also flags it; if any fallback accepts the word, it is not flagged. For example, `"dialect": "Australian"` with `"dialectFallbacks": ["American"]` suggests Australian spellings but does not flag American ones. Invalid names, duplicates, and the primary dialect are ignored. Suggestions always come from the primary `dialect`.
 - `disabledLintKinds`: Additional lint kinds to filter out. Available kinds:
   - `Agreement`, `BoundaryError`, `Capitalization`, `Eggcorn`, `Enhancement`
   - `Formatting`, `Grammar`, `Malapropism`, `Miscellaneous`, `Nonstandard`

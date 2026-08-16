@@ -121,6 +121,58 @@ describe('proofreading settings', () => {
     }).autoLintDelay).toBe(1000);
   });
 
+  it('defaults dialect to American with no fallbacks', () => {
+    const settings = getProofreadingSettings(undefined);
+
+    expect(settings.dialect).toBe('American');
+    expect(settings.dialectFallbacks).toEqual([]);
+  });
+
+  it('parses a dialect and fallbacks from user settings', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        dialect: 'Australian',
+        dialectFallbacks: ['American'],
+      },
+    });
+
+    expect(settings.dialect).toBe('Australian');
+    expect(settings.dialectFallbacks).toEqual(['American']);
+  });
+
+  it('falls back to American for an unrecognized dialect', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        dialect: 'Klingon',
+      },
+    });
+
+    expect(settings.dialect).toBe('American');
+  });
+
+  it('drops invalid, duplicate, and primary entries from dialectFallbacks', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        dialect: 'British',
+        dialectFallbacks: ['American', 'Klingon', 'American', 'British', 42, 'Australian'],
+      },
+    });
+
+    expect(settings.dialect).toBe('British');
+    expect(settings.dialectFallbacks).toEqual(['American', 'Australian']);
+  });
+
+  it('ignores dialectFallbacks when it is not an array', () => {
+    const settings = getProofreadingSettings({
+      'extension.markeditProofreading': {
+        dialect: 'Australian',
+        dialectFallbacks: 'American',
+      },
+    });
+
+    expect(settings.dialectFallbacks).toEqual([]);
+  });
+
   it('defaults addToDict to true and allows disabling', () => {
     expect(getProofreadingSettings(undefined).addToDict).toBe(true);
 

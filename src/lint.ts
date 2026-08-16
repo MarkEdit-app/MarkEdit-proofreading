@@ -1,13 +1,25 @@
-import { LocalLinter, binary, type LintConfig } from 'harper.js';
+import { LocalLinter, binary, Dialect, type LintConfig, type Lint } from 'harper.js';
 import { MarkEdit } from 'markedit-api';
-import { getProofreadingSettings } from './settings';
+import { getProofreadingSettings, type DialectName } from './settings';
 import { presetDisabledRules } from './rules';
 import { presetDisabledKinds } from './kinds';
+import { keepSpellingLint, spanKey } from './fallback';
 import { loadWords, saveWords } from './dict';
+
+const dialectByName: Record<DialectName, Dialect> = {
+  American: Dialect.American,
+  British: Dialect.British,
+  Australian: Dialect.Australian,
+  Canadian: Dialect.Canadian,
+  Indian: Dialect.Indian,
+};
 
 const linter = new LocalLinter({ binary });
 const settings = getProofreadingSettings(MarkEdit.userSettings);
 const disabledKinds = resolveDisabledKinds();
+// One extra linter per fallback dialect; only used to test whether a word is an accepted
+// spelling in that dialect. Created only when fallbacks are configured.
+const fallbackLinters = settings.dialectFallbacks.map(() => new LocalLinter({ binary }));
 const linterReady = configureLinter().catch(error => {
   console.warn('[MarkEdit-proofreading] Failed to configure linter.', error);
 });
@@ -19,11 +31,38 @@ export async function lint(text: string) {
   const lints = await linter.lint(text);
 
   // Post-filter by kind as a safety net for rules not covered by the static lists
-  if (disabledKinds.size === 0) {
-    return lints;
+  const kept = disabledKinds.size === 0
+    ? lints
+    : lints.filter(lint => !disabledKinds.has(lint.lint_kind()));
+
+  if (fallbackLinters.length === 0) {
+    return kept;
   }
 
-  return lints.filter(lint => !disabledKinds.has(lint.lint_kind()));
+  return filterByFallbackDialects(text, kept);
+}
+
+// Drops Spelling lints for words that are valid in a configured fallback dialect, so a primary
+// dialect of e.g. Australian still accepts American spellings while suggesting Australian ones.
+async function filterByFallbackDialects(text: string, lints: Lint[]): Promise<Lint[]> {
+  const fallbackSpellingSpans = await Promise.all(
+    fallbackLinters.map(async fallback => {
+      const fallbackLints = await fallback.lint(text);
+      return new Set(
+        fallbackLints
+          .filter(lint => lint.lint_kind() === 'Spelling')
+          .map(lint => spanKey(lint.span())),
+      );
+    }),
+  );
+
+  return lints.filter(lint => {
+    if (lint.lint_kind() !== 'Spelling') {
+      return true;
+    }
+
+    return keepSpellingLint(spanKey(lint.span()), fallbackSpellingSpans);
+  });
 }
 
 export async function resetDictionary(): Promise<void> {
@@ -54,6 +93,11 @@ function resolveDisabledKinds(): ReadonlySet<string> {
 }
 
 async function configureLinter() {
+  await linter.setDialect(dialectByName[settings.dialect]);
+  await Promise.all(
+    settings.dialectFallbacks.map((name, index) => fallbackLinters[index].setDialect(dialectByName[name])),
+  );
+
   const disabledRules = presetDisabledRules(settings.lintPreset);
   const hasRuleConfig =
     disabledRules.length > 0 ||
